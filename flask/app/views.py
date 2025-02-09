@@ -2,10 +2,71 @@ import json
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
 
+
 from sqlalchemy.sql import text
 from app import app
 from app import db
 from app.models.contact import Contact
+
+
+
+from app.controllers import table_mange
+from app.controllers import menu_manage
+from app.controllers import employee_manage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/')
 def home():
@@ -70,7 +131,7 @@ def lab10_phonebook():
             db.session.commit()
 
         return lab10_db_contacts()
-    return app.send_static_file('lab10_phonebook.html')
+    return app.send_static_file('test.html')
 
 @app.route("/lab10/contacts")
 def lab10_db_contacts():
@@ -96,3 +157,4 @@ def lab10_remove_contacts():
             app.logger.error(f"Error removing contact with id {id_}: {ex}")
             raise
     return lab10_db_contacts()
+
