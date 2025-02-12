@@ -6,7 +6,6 @@ from app.models.base import Employee
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
 
-from app.controllers import Admin
 from app.models.base import Employee
 
 @app.route('/em', methods=('GET', 'POST'))
@@ -64,7 +63,7 @@ def em_remove_em():
         result = request.form.to_dict()
         id_ = result.get('id', '')
         try:
-            em = em.query.get(id_)
+            em = Employee.query.get(id_)
             db.session.delete(em)
             db.session.commit()
         except Exception as ex:

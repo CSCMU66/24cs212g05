@@ -42,7 +42,7 @@ class Menu(db.Model, SerializerMixin):
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
-    availability = db.Column(db.Boolean, nullable=False)  # เปลี่ยนเป็น Boolean
+    availability = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, name, description, price, category, image_url=None, availability=True):
         self.name = name
