@@ -1,13 +1,17 @@
-import json
-from flask import (jsonify, render_template,
-                  request, url_for, flash, redirect)
-
+import os
+from flask import (jsonify, render_template, request, url_for, flash, redirect)
+from werkzeug.utils import secure_filename
 from sqlalchemy.sql import text
-from app import app
-from app import db
-
-from app.controllers import Admin
+from app import app, db
 from app.models.base import Menu
+
+UPLOAD_FOLDER = 'static/food_image'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/menu', methods=('GET', 'POST'))
 def menu_list():
@@ -17,7 +21,7 @@ def menu_list():
         id_ = result.get('id', '')  # รับค่า id จากฟอร์ม
         validated = True
         validated_dict = dict()
-        valid_keys = ['name', 'description', 'price', 'category', 'image_url', 'availability']
+        valid_keys = ['name', 'description', 'price', 'category', 'availability']
 
         # Validate the input
         for key in result:
@@ -33,6 +37,14 @@ def menu_list():
         # แปลงค่า availability จากสตริงเป็นบูลีน
         if 'availability' in validated_dict:
             validated_dict['availability'] = validated_dict['availability'].lower() == 'true'
+
+        # Handle file upload
+        if 'image_file' in request.files:
+            file = request.files['image_file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                validated_dict['image_url'] = url_for('static', filename=f'food_image/{filename}')
 
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))

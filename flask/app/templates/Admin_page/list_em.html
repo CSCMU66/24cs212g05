@@ -155,13 +155,16 @@
   }
 
   function removeItem(row) {
-    if (!confirm('Delete employee with ID ' + row.em_id + '?')) {
+    if (!confirm('Delete Employee with ID ' + row.em_id + '?')) {
       return false;
     }
     var url = '/em/remove_em';
     var formData = { id: row.em_id };
-    $.post(url, formData, function (employee_data) {
-      refresh_employee_table(employee_data);
+    $.post(url, formData, function (table_data) {
+      refresh_employee_table(table_data);
+      alert('Employee with ID ' + row.em_id + ' has been deleted.');
+    }).fail(function() {
+      alert('Failed to delete Employee with ID ' + row.em_id);
     });
   }
 

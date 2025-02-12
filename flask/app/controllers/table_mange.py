@@ -6,7 +6,6 @@ from sqlalchemy.sql import text
 from app import app
 from app import db
 
-from app.controllers import Admin
 from app.models.base import CTable
 
 @app.route('/table', methods=('GET', 'POST'))
