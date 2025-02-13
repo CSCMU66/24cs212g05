@@ -3,6 +3,8 @@ from flask import Flask, request, redirect
 from werkzeug.debug import DebuggedApplication
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_migrate import Migrate
+
 
 app = Flask(__name__, static_folder='static')
 app.url_map.strict_slashes = False
@@ -29,6 +31,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 # login_manager.login_view = 'lab11_login'
 login_manager.init_app(app)
+migrate = Migrate(app, db)
 
 @app.before_request
 def remove_trailing_slash():

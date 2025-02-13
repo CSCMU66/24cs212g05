@@ -9,7 +9,6 @@ from sqlalchemy.sql import text
 from flask_login import login_user
 from app import app
 from app import db
-from app.models.contact import Contact
 
 
 

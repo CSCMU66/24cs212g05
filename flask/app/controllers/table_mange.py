@@ -1,22 +1,22 @@
 import json
-from sqlalchemy.sql import text
-from app import app
-from app import db
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
 
-from app.controllers import Admin
-from app.models.employee import Employee
+from sqlalchemy.sql import text
+from app import app
+from app import db
 
-@app.route('/em', methods=('GET', 'POST'))
-def em_list():
+from app.models.base import CTable
+
+@app.route('/table', methods=('GET', 'POST'))
+def table_list():
     if request.method == 'POST':
         result = request.form.to_dict()
         app.logger.debug(str(result))
         id_ = result.get('id', '')  # รับค่า id จากฟอร์ม
         validated = True
         validated_dict = dict()
-        valid_keys = ['firstname', 'lastname', 'phone', 'role']
+        valid_keys = ['qr_code', 'status']
 
         # Validate the input
         for key in result:
@@ -32,42 +32,41 @@ def em_list():
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
             if not id_:  # ถ้าไม่มี id => เพิ่มใหม่
-                entry = Employee(**validated_dict)
+                entry = CTable(**validated_dict)
                 db.session.add(entry)
             else:  # ถ้ามี id => แก้ไขรายการเดิม
-                employee = Employee.query.get(id_)
-                if employee:
+                table = CTable.query.filter_by(CT_id=id_).first()
+                if table:
                     for key, value in validated_dict.items():
-                        setattr(employee, key, value)
+                        setattr(table, key, value)
 
             db.session.commit()
 
-        return em_db_ems()
-    return render_template('Admin_page/list_em.html')
+        return table_db_tables()
+    return render_template('Admin_page/list_table.html')
 
-@app.route("/em/ems")
-def em_db_ems():
-    ems = []
-    # ดึงข้อมูลจากฐานข้อมูล พร้อมเรียงลำดับตาม name
-    db_employees = Employee.query.all()
+@app.route("/table/tables")
+def table_db_tables():
+    tables = []
+    # ดึงข้อมูลจากฐานข้อมูล พร้อมเรียงลำดับตาม CT_id
+    db_tables = CTable.query.order_by(CTable.CT_id).all()
 
-    ems = list(map(lambda x: x.to_dict(), db_employees))
-    app.logger.debug("DB employees (Sorted): " + str(ems))
+    tables = list(map(lambda x: x.to_dict(), db_tables))
+    app.logger.debug("DB Tables (Sorted): " + str(tables))
 
-    return jsonify(ems)
+    return jsonify(tables)
 
-@app.route('/em/remove_em', methods=('GET', 'POST'))
-def em_remove_em():
-    app.logger.debug("em - REMOVE em")
+@app.route('/table/remove_table', methods=('GET', 'POST'))
+def table_remove_table():
+    app.logger.debug("table - REMOVE TABLE")
     if request.method == 'POST':
         result = request.form.to_dict()
         id_ = result.get('id', '')
         try:
-            em = Employee.query.get(id_)
-            db.session.delete(em)
+            table = CTable.query.get(id_)
+            db.session.delete(table)
             db.session.commit()
         except Exception as ex:
-            app.logger.error(f"Error removing em with id {id_}: {ex}")
+            app.logger.error(f"Error removing table with id {id_}: {ex}")
             raise
-    return em_db_ems()
-
+    return table_db_tables()
