@@ -4,7 +4,7 @@ from flask import (jsonify, render_template,
 
 from werkzeug.security import check_password_hash
 from werkzeug.urls import url_parse
-from app import login_manager
+# from app import login_manager
 from sqlalchemy.sql import text
 from flask_login import login_user
 from app import app
