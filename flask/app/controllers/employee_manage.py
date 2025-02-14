@@ -2,11 +2,11 @@ import json
 from sqlalchemy.sql import text
 from app import app
 from app import db
-from app.models.base import Employee
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
 
-from app.models.base import Employee
+from app.controllers import Admin
+from app.models.employee import Employee
 
 @app.route('/em', methods=('GET', 'POST'))
 def em_list():
@@ -70,3 +70,4 @@ def em_remove_em():
             app.logger.error(f"Error removing em with id {id_}: {ex}")
             raise
     return em_db_ems()
+

@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <!-- Bootstrap -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+            integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+            crossorigin="anonymous"
+        />
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+        <!-- Bootstrap Table -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.css"
+        />
+        <script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>
+        <!-- our own css -->
+        <style>
+          @import url("https://fonts.googleapis.com/css?family=Kanit");
+
+          body {
+              font-family: "Kanit", Arial, Helvetica, sans-serif;
+          }
+
+          * {
+              box-sizing: border-box;
+          }
+
+          input[type="text"],
+          input[type="tel"],
+          select,
+          textarea {
+              width: 100%;
+              padding: 5px;
+              border: 1px solid #ccc;
+              border-radius: 8px;
+              box-sizing: border-box;
+              margin-top: 6px;
+              margin-bottom: 16px;
+              resize: vertical;
+          }
+
+          label {
+              width: 100px;
+          }
+
+          input[type="submit"],
+          input[type="reset"],
+          button {
+              background-color: #04aa6d;
+              color: white;
+              padding: 12px 20px;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+          }
+
+          input[type="submit"]:hover {
+              background-color: #45a049;
+          }
+
+          .box1 {
+              width: 49%;
+              float: left;
+          }
+
+          .box2 {
+              width: 49%;
+              float: right;
+          }
+
+          .box3 {
+              float: right;
+          }
+
+          .container {
+              border-radius: 5px;
+              background-color: #f2f2f2;
+              padding: 20px;
+          }
+
+          #header {
+              background-color: #ffffff;
+          }
+
+          .left {
+              float: left;
+          }
+
+          .right {
+              float: right;
+          }
+
+          .edit {
+              margin-right: 10px;
+          }
+
+          .item {
+              margin-bottom: 20px;
+          }
+
+          #phonebook-table {
+              width: 95%;
+              margin-left: auto;
+              margin-right: auto;
+          }
+        </style>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+
+    <body>
+        <div id="header" class="container">
+            <div class="box3">
+              <button id="logout" type="button">Logout</button>
+            </div>
+            <h1>'s Phonebook</h1>
+          </div>
+         
+        <div id="add-edit" class="container" hidden="hidden">
+            <h2 id="add-edit-caption">Add/Edit a Contact:</h2>
+            <form id="addPhoneNumberForm">
+                
+                <input type="hidden" id="entryid" name="id" value="" />
+                <input type="hidden" id="entryid" name="is_employee" value="True" />
+                <input type="submit" name="submit" value="Submit" />
+                <button id="clear_form" type="button">Clear</button>
+                <button id="cancel_form" type="button">Cancel</button>
+            </form>
+        </div>
+        &nbsp;
+        <div id="contact_display" class="container">
+            <button id="add_contact" type="button">Create Contact</button>
+            <h2>Contacts:</h2>
+            <table class="table-striped border-success" id="phonebook-table">
+                <thead>
+                    <tr>
+                        <th data-field="table_id">
+                            <span class="text-success"> table_id </span>
+                        </th>
+                        <th data-field="qrcode">
+                            <span class="text-success"> qrcode </span>
+                        </th>
+                        <th data-field="status">
+                            <span class="text-success"> status </span>
+                        </th>
+                        <th
+                            data-field="operation"
+                            data-formatter="actionFormatter"
+                            data-events="operateEvents"
+                        >
+                            <span class="text-success"> แก้ไข/ลบ </span>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <script>
+            function populate_table(data) {
+                console.log(data)
+                $("#phonebook-table").bootstrapTable({
+                    data: data,
+                });
+                // $("#phonebook-table").bootstrapTable("hideColumn", "id");
+            }
+
+            $(document).ready(function () {
+                (function () {
+                    $.getJSON("/table/get_all_table", populate_table);
+                })();
+            });
+
+            function refresh_table(data) {
+                $("#phonebook-table").bootstrapTable("load", data);
+            }
+
+            $("#clear_form").click(function () {
+                clearForm();
+            });
+
+            $("#cancel_form").click(function () {
+                clearForm();
+                toggleView();
+            });
+            // function createNewBlog(){
+
+            //     var url = "/hw10/createBlog";
+            //     var formData = {'is_employee':True};
+            //     $.post(url, formData, function (Data) {
+            //         refresh_table(data);
+            //     });
+            //     toggleView();
+                
+            // };
+
+            $("#addPhoneNumberForm").submit(function (event) {
+                // prevent default html form submission action
+                event.preventDefault();
+
+                // pack the inputs into a dictionary
+                var formData = {};
+                $(":input").each(function () {
+                    var key = $(this).attr("name");
+                    var val = $(this).val();
+                    if (key != "submit") {
+                        formData[key] = val;
+                    }
+                });
+                // formData['is_employee'] = True;
+
+                var $form = $(this);
+                var url = '/table/create';
+
+                // make a POST call to the back end w/ a callback to refresh the table
+                $.post(url, formData, function (data) {
+                    refresh_table(data);
+                    clearForm();
+                });
+                toggleView();
+            });
+
+            function clearForm() {
+                $("#addPhoneNumberForm")[0].reset();
+                $("#entryid").val("");
+            }
+
+            function actionFormatter(value, row, index) {
+                return [
+                    '<a class="edit" href="javascript:void(0)" title="Edit">',
+                    "✏️",
+                    "</a>  ",
+                    '<a class="remove" href="javascript:void(0)" title="Remove">',
+                    "🗑️",
+                    "</a>",
+                ].join("");
+            }
+
+            window.operateEvents = {
+                "click .edit": function (e, value, row, index) {
+                    prePopulateForm(row);
+                },
+                "click .remove": function (e, value, row, index) {
+                    removeItem(row);
+                },
+            };
+
+            function prePopulateForm(row) {
+                $("#addPhoneNumberForm")[0].reset();
+                $("#firstname").val(row.firstname);
+                $("#lastname").val(row.lastname);
+                $("#phone").val(row.phone);
+                $("#entryid").val(row.id);
+                toggleView();
+            }
+
+            function removeItem(row) {
+                if (
+                    !confirm(
+                        "Delete " + row.firstname + " " + row.lastname + "?",
+                    )
+                ) {
+                    return false;
+                }
+                var url = "lab10/remove_contact";
+                var formData = { id: row.id };
+                $.post(url, formData, function (contact_data) {
+                    refresh_table(contact_data);
+                });
+            }
+
+            function toggleView() {
+                if ($("#contact_display").attr("hidden")) {
+                    $("#contact_display").removeAttr("hidden");
+                    $("#add-edit").attr("hidden", "hidden");
+                } else {
+                    $("#contact_display").attr("hidden", "hidden");
+                    $("#add-edit").removeAttr("hidden");
+                }
+            }
+
+            $("#add_contact").click(function () {
+                clearForm();
+                toggleView();
+            });
+            $("#logout").click(function () {
+                clearForm();
+                window.location.href = "lab11/logout";
+            });
+        </script>
+    </body>
+</html>
