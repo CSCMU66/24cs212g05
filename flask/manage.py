@@ -10,7 +10,7 @@ base เก็บข้อมูลพทัวไป
 : Menu สำหรับเก็บข้อมูลเมนูอาหาร
 : Employee สำหรับเก็บข้อมูลพนักงาน
 '''
-from app.models.base import CTable
+# from app.models.base import CTable
 from app.models.menu import Menu
 from app.models.employee import Employee
 from app.models.table import Tables

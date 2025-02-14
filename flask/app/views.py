@@ -2,6 +2,7 @@ import json
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
 
+# from app.controllers import table_manage
 from werkzeug.security import check_password_hash
 from werkzeug.urls import url_parse
 # from app import login_manager
@@ -16,7 +17,7 @@ from app import db
 '''
 หน้า Admin
 '''
-from app.controllers import Admin, table_menage
+from app.controllers import Admin
 
 # @app.route('/test', methods=('GET', 'POST'))
 # def test():
