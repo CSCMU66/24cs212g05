@@ -10,4 +10,5 @@ SQLAlchemy-serializer==1.4.1
 Flask-Login==0.6.3
 qrcode==8.0
 qrcode[pil]
+PyJWT==2.1.0
 Flask-Migrate==3.1.0 # for database migration

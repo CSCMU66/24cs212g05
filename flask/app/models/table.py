@@ -30,6 +30,9 @@ class Tables(db.Model, SerializerMixin):
     def update_status(self, status):
         self.status = status
 
+    def change_qrcode(self, qrcode):
+        self.qrcode_url = qrcode
+
     # def gennerate_qrcode(self, id):
     #     img = qrcode.make('google.com') # Must to change to menu select url
     #     type(img)  # qrcode.image.pil.PilImage

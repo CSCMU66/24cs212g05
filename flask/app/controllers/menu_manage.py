@@ -89,39 +89,139 @@ def menu_remove_menu():
             raise
     return menu_db_menus()
 
-# @app.route('/menu/create_menu', methods=('GET', 'POST'))
-# def hw10_create():
-#     app.logger.debug("menu - CREATE menu")
-#     if request.method == 'POST':
-#         result = request.form.to_dict()
+@app.route('/menus/create', methods=('GET', 'POST'))
+def menu_create():
+    app.logger.debug("Menu - CREATE")
+    if request.method == 'POST':
+        
+        result = request.form.to_dict()
 
-#         validated = True
-#         validated_dict = dict()
-#         valid_keys = ['email', 'name', 'message', 'date_created', 'owner_id']
-
-
-#         # validate the input
-#         for key in result:
-#             app.logger.debug(f"{key}: {result[key]}")
-#             # screen of unrelated inputs
-#             if key not in valid_keys:
-#                 continue
+        validated = True
+        valid_keys = ['is_employee', 'name', 'description', 'price', 'category', 'image_url', 'availability']
+        validated_dict = dict()
+        for key in result:
+            app.logger.debug(f"{key}: {result[key]}")
+            # screen of unrelated inputs
+            if key not in valid_keys:
+                continue
 
 
-#             value = result[key].strip()
-#             if not value or value == 'undefined':
-#                 validated = False
-#                 break
-#             validated_dict[key] = value
+            value = result[key].strip()
+            if not value or value == 'undefined':
+                validated = False
+                break
+            if key == 'is_employee' and result[key].lower() != "true":
+                validated = False    
+                break
+            validated_dict[key] = value
+
+        if validated:
+            try:
+                db.session.add(Menu(
+                    name = validated_dict['name'],
+                    description = validated_dict['description'],
+                    price= validated_dict['price'],
+                    category= validated_dict['catagory'],
+                    image_url= validated_dict['image_url'],
+                    availability= validated_dict['availability']
+                    ))
+                db.session.commit()
+                
+            except Exception as ex:
+                app.logger.error(f"Error create new menu: {ex}")
+                raise
             
-#         if validated:    
-#             try:
-#                 db.session.add(OwnBlogEntry(**validated_dict))
-#                 db.session.commit()
-#             except Exception as ex:
-#                 app.logger.error(f"Error create new blog: {ex}")
-#                 raise
+    return menus_list()
 
-#     return menu_db_menus()
+@app.route('/menus/get_all_menus')
+def menus_list():
+    db_allmenus = Menu.query.all()
+    menus = list(map(lambda x: x.to_dict(), db_allmenus))
+    menus.sort(key=(lambda x: int(x['id'])))
+    app.logger.debug(f"DB Get tables data: {menus}")
+    return jsonify(menus)
 
+@app.route('/menus/update', methods=('GET', 'POST'))
+def menu_update():
+    if request.method == 'POST':
+        app.logger.debug("Menu - UPDATE")
+        result = request.form.to_dict()
+        
+        validated = True
+        validated_dict = dict()
+        valid_keys = ['is_employee', 'id', 'availability']
+
+        for key in result:
+            app.logger.debug(f"{key}: {result[key]}")
+            # screen of unrelated inputs
+            if key not in valid_keys is True:
+                continue
+            
+
+            value = result[key].strip()
+            if not value or value == 'undefined':
+                validated = False
+                break
+            if key == 'is_employee' and result[key].lower() != "true":
+                validated = False    
+                break
+            validated_dict[key] = value
+
+        app.logger.debug(validated_dict)
+        if validated:
+            try:
+                menus = Menu.query.get(validated_dict['id'])
+                menus.update_availability(validated_dict['availability'])
+                db.session.commit()
+            except Exception as ex:
+                app.logger.error(f"Error update menu availability: {ex}")
+                raise
+
+    return menus_list()
+
+@app.route('/menus/delete', methods=('GET', 'POST'))
+def menu_delete():
+    if request.method == 'POST':
+        app.logger.debug("Menu - DELETE")
+        result = request.form.to_dict()
+
+        validated = True
+        validated_dict = dict()
+        valid_keys = ['is_employee', 'id']
+        for key in result:
+            app.logger.debug(f"{key}: {result[key]}")
+            # screen of unrelated inputs
+            if key not in valid_keys:
+                continue
+
+
+            value = result[key].strip()
+            if not value or value == 'undefined':
+                validated = False
+                break
+            if key == 'is_employee' and result[key].lower() != "true":
+                validated = False    
+                break
+            validated_dict[key] = value
+            
+        if validated:
+            try:
+                menus = Menu.query.get(validated_dict['id'])
+                db.session.delete(menus)
+                db.session.commit()
+            except Exception as ex:
+                app.logger.error(f"Error delete menu: {ex}")
+                raise
+
+    return menus_list()
+
+@app.route('/menus/top3')
+def menu_get_top3():
+    db_allmenus = Menu.query.all()
+    menus = list(map(lambda x: x.to_dict(), db_allmenus))
+    menus.sort(key=(lambda x: int(x['ordered'])), reverse=True)
+    temp = []
+    for i in range(3):
+        temp += [menus[i]]
+    return jsonify(temp)
 

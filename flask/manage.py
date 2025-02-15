@@ -1,7 +1,9 @@
 from flask.cli import FlaskGroup
 from app import app, db
 from app.models.contact import Contact
+import jwt
 import qrcode
+import secrets
 
 #!-------------------------------------------------------------------------
 ''' 
@@ -14,6 +16,7 @@ base เก็บข้อมูลพทัวไป
 from app.models.menu import Menu
 from app.models.employee import Employee
 from app.models.table import Tables
+from app.models.order import Order
 
 '''
 buy 
@@ -36,6 +39,8 @@ to see database
 #!-------------------------------------------------------------------------
 
 cli = FlaskGroup(app)
+SECRET_KEY = 'wail to generate'
+
 @cli.command("create_db")
 def create_db():
     db.drop_all()
@@ -55,13 +60,23 @@ def seed_db():
     # db.session.add(CTable(ctable_name="t2", status='Occupied'))
 
     def gennerate_qrcode(id):
-        img = qrcode.make('google.com') # Must to change to menu select url
+        token = generate_jwt(id)
+        img = qrcode.make(f'http://localhost:56733/menu/table/{token}') # Must to change to menu select url
         type(img)  # qrcode.image.pil.PilImage
         img.save(f"app/static/qrcode/{id}.png")
         return f"app/static/qrcode/{id}.png"
 
+    def generate_jwt(table_number):
+        expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+        payload = {
+            'table_number': table_number,
+            'exp': expiration_time
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        return token
+
     for i in range(1, 21):
-        db.session.add(Tables(table_id=i, qrcode=gennerate_qrcode(i)))
+        db.session.add(Tables(qrcode=gennerate_qrcode(i)))
     # db.session.add(Tables(table_id=1, qrcode='/static/qrcode/1.png'))
     # db.session.add(Tables(table_id=2, qrcode='/static/qrcode/2.png'))
     db.session.commit()
@@ -108,6 +123,41 @@ def seed_db():
 
     for name, desc, price, cat, image_url in sample_menus:
         db.session.add(Menu(name=name, description=desc, price=price, category=cat, image_url=image_url))
+
+    #?-------------------------------------------------------------------------
+    # สร้างข้อมูล Order
+
+    def cal_price(menu_list):
+        db_allmenus = Menu.query.all()
+        menus = list(map(lambda x: x.to_dict(), db_allmenus))
+        menus.sort(key=(lambda x: int(x['id'])))
+        app.logger.debug(f"DB Get menus data to cal_price() in Order")
+
+        total = 0
+        # note menu_list key start at 0 but menus start at 1
+        for key in menu_list:
+            app.logger.debug(f"{key} : {int(menus[key - 1]['price']) * menu_list[key]}")
+            total += int(menus[key - 1]['price']) * menu_list[key]
+            plus_menu_ordered(key, menu_list[key])
+            
+        return total
+
+    def plus_menu_ordered(menu_id, amount):
+        menu = Menu.query.get(menu_id)
+        menu.update_ordered(amount)
+        db.session.commit()
+    
+    a = [{1:2, 11:3}, {1:77, 11:9}, {4:2}]
+    for i in a:
+        temp = Order(table_id=12, 
+                         time=datetime.datetime.now(), 
+                         menu_list=i)
+        temp.change_price(cal_price(i))
+        db.session.add(temp)
+        # db.session.commit()
+        
+        # db.session.commit()
+    db.session.commit()
 
     #?-------------------------------------------------------------------------
     # สร้างข้อมูลพนักงาน
@@ -184,6 +234,10 @@ def seed_db():
         db.session.add(Contact(firstname=f'John{i}', lastname=f'Doe{i}', phone=f'12345678{i}'))
     
     db.session.commit()
+
+@cli.command("secret_key")
+def generate_secret_key():
+    SECRET_KEY = secrets.token_hex(32)
 
 if __name__ == "__main__":
     cli()
