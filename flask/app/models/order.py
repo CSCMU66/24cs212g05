@@ -9,7 +9,7 @@ class Order(db.Model, SerializerMixin):
     __tablename__ = "orders"
 
     order_id = db.Column(db.Integer, primary_key=True)  # รหัสคำสั่งซื้อ (Primary Key)
-    table_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)  # รหัสโต๊ะที่สั่ง (Foreign Key)
+    table_id = db.Column(db.Integer, db.ForeignKey('Tables.table_id'), nullable=False)  # รหัสโต๊ะที่สั่ง (Foreign Key)
     order_time = db.Column(db.DateTime, nullable=False)  # เวลาที่สั่ง
     status = db.Column(db.String(20), nullable=False, default="Preparing")  # สถานะคำสั่งซื้อ
     

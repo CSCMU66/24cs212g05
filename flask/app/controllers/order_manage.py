@@ -84,7 +84,7 @@ def plus_menu_ordered(menu_id, amount):
 
 
 @app.route('/orders/update', methods=('GET', 'POST'))
-def customer_update():
+def order_update():
     if request.method == 'POST':
         app.logger.debug("Order - UPDATE")
         result = request.form.to_dict()
@@ -122,7 +122,7 @@ def customer_update():
     return orders_list()
 
 @app.route('/orders/delete', methods=('GET', 'POST'))
-def customer_delete():
+def order_delete():
     if request.method == 'POST':
         app.logger.debug("Orders - DELETE")
         result = request.form.to_dict()

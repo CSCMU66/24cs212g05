@@ -17,8 +17,7 @@ class Tables(db.Model, SerializerMixin):
     สถานะโต๊ะ ("Available", "Occupied", "Reserved", "Paid")
     '''
 
-    def __init__(self, table_id, qrcode):
-        self.table_id = table_id
+    def __init__(self, qrcode):
         self.qrcode = qrcode
         self.status = "Available"
 

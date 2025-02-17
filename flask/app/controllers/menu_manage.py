@@ -215,7 +215,7 @@ def menu_delete():
 
     return menus_list()
 
-@app.route('/menus/top3')
+@app.route('/menus/top3', methods=('GET', 'POST'))
 def menu_get_top3():
     db_allmenus = Menu.query.all()
     menus = list(map(lambda x: x.to_dict(), db_allmenus))

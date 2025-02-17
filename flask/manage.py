@@ -2,8 +2,10 @@ from flask.cli import FlaskGroup
 from app import app, db
 from app.models.contact import Contact
 import jwt
+import datetime 
 import qrcode
 import secrets
+
 
 #!-------------------------------------------------------------------------
 ''' 
@@ -43,9 +45,12 @@ SECRET_KEY = 'wail to generate'
 
 @cli.command("create_db")
 def create_db():
+    db.reflect()
     db.drop_all()
     db.create_all()
     db.session.commit()
+
+
 
 @cli.command("seed_db")
 def seed_db():
@@ -67,13 +72,14 @@ def seed_db():
         return f"app/static/qrcode/{id}.png"
 
     def generate_jwt(table_number):
-        expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+        expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=48)
         payload = {
             'table_number': table_number,
             'exp': expiration_time
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         return token
+
 
     for i in range(1, 21):
         db.session.add(Tables(qrcode=gennerate_qrcode(i)))
@@ -210,16 +216,15 @@ def seed_db():
     #?-------------------------------------------------------------------------
     # สร้างข้อมูลคำสั่งซื้อ
     import random
-    from datetime import datetime, timedelta
 
     payment_methods = ["cash", "credit_card", "paypal", "bank_transfer"]
-    start_time = datetime(2024, 2, 12, 10, 0, 0)
+    start_time = datetime.datetime(2024, 2, 12, 10, 0, 0)
 
     sample_payments = [
     [
         str(i + 1),  # order_id
         random.choice(payment_methods),  # payment_method
-        (start_time + timedelta(minutes=i * 5)).strftime("%Y-%m-%d %H:%M:%S"),  # payment_time
+        (start_time + datetime.timedelta(minutes=i * 5)).strftime("%Y-%m-%d %H:%M:%S"),  # payment_time
         str(random.randint(100, 5000))  # amount
     ]
     for i in range(100)
