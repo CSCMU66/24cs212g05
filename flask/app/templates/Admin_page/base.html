@@ -49,19 +49,14 @@
       <aside class="menu">
         <ul class="menu-list">
           <li>
-            <a class="menu-label" id="dashboard-label">Dashboard</a>
-            <ul class="submenu">
-              <li><a href="{{ url_for('revenue') }}" class="{% if request.endpoint == 'revenue' %}is-active{% endif %}"><i class="fas fa-table"></i> Revenue</a></li>
-              <li><a href="{{ url_for('menu_list') }}" class="{% if request.endpoint == 'order_count' %}is-active{% endif %}"><i class="fas fa-utensils"></i> Number of Orders</a></li>
-              <li><a href="{{ url_for('menu_list') }}" class="{% if request.endpoint == 'table_usage' %}is-active{% endif %}"><i class="fas fa-users"></i> Number of Tables Used</a></li>
-            </ul>
+            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}is-active{% endif %}">Dashboard</a>
           </li>
           <li>
             <a class="menu-label" id="management-label">Management</a>
             <ul class="submenu">
-              <li><a href="{{ url_for('table_list') }}" class="{% if request.endpoint == 'table_list' %}is-active{% endif %}"><i class="fas fa-table"></i> Table Management</a></li>
-              <li><a href="{{ url_for('menu_list') }}" class="{% if request.endpoint == 'menu_list' %}is-active{% endif %}"><i class="fas fa-utensils"></i> Menu Management</a></li>
-              <li><a href="{{ url_for('em_list') }}" class="{% if request.endpoint == 'em_list' %}is-active{% endif %}"><i class="fas fa-users"></i> Employee Management</a></li>
+              <li><a href="{{ url_for('table_list') }}" class="{% if request.endpoint == 'table_list' %}is-active{% endif %}">Table Management</a></li>
+              <li><a href="{{ url_for('menu_list') }}" class="{% if request.endpoint == 'menu_list' %}is-active{% endif %}">Menu Management</a></li>
+              <li><a href="{{ url_for('em_list') }}" class="{% if request.endpoint == 'em_list' %}is-active{% endif %}">Employee Management</a></li>
             </ul>
           </li>
           <li><a href="{{ url_for('menu_list') }}" class="{% if request.endpoint == 'order' %}is-active{% endif %}">Order</a></li>
@@ -69,6 +64,7 @@
         </ul>
       </aside>
     </div>
+    
 
     <!-- Main Content -->
     <div class="column main-content">

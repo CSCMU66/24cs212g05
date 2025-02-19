@@ -1,0 +1,104 @@
+{% extends 'Admin_page/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div id="header" class="container">
+        <h1 class="title has-text-black">Dashboard</h1>
+    </div>
+    <div class="columns is-multiline">
+        <div class="column is-half">
+            <canvas id="top10MenuChart" width="400" height="200"></canvas>
+        </div>
+        <div class="column is-half">
+            <canvas id="top10worseMenuChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+'''
+    ส่วนนี้เป็นส่วนที่ใช้สำหรับการเขียน JavaScript โดยใช้ Chart.js ในการสร้างกราฟ
+    โดยจะทำการดึงข้อมูลจาก API ที่เราได้สร้างไว้ในส่วนของ Flask มาใช้ในการสร้างกราฟ
+'''
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+'''
+    แผนภูมแท่งกราฟ 10 อันดับเมนูยอดนิยม
+'''
+<script>
+    $(document).ready(function () {
+        $.getJSON('/menus/get_all_menus', function (data) {
+            data.sort((a, b) => b.ordered - a.ordered);
+            const top10Menus = data.slice(0, 10);
+            const menuNames = top10Menus.map(menu => menu.name);
+            const orderedCounts = top10Menus.map(menu => menu.ordered);
+
+            const ctx = document.getElementById('top10MenuChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: menuNames,
+                    datasets: [{
+                        label: 'จำนวนการสั่ง',
+                        data: orderedCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+'''
+    แผนภูมแท่งกราฟ 10 อันดับเมนูยอดนิยม
+'''
+<script>
+    $(document).ready(function () {
+        $.getJSON('/menus/get_all_menus', function (data) {
+            data.sort((a, b) => a.ordered - b.ordered);
+            const top10worseMenuChart = data.slice(0, 10);
+            const menuNames = top10worseMenuChart.map(menu => menu.name);
+            const orderedCounts = top10worseMenuChart.map(menu => menu.ordered);
+
+            const ctx = document.getElementById('top10worseMenuChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: menuNames,
+                    datasets: [{
+                        label: 'จำนวนการสั่ง',
+                        data: orderedCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+
+{% endblock %}
