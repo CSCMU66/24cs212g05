@@ -50,12 +50,12 @@
         </div>
       </div>
       <div class="field">
-        <label class="label has-text-black" for="menu_id">Menu ID</label>
+        <label class="label has-text-black" for="id">Menu ID</label>
         <div class="control">
-          <input class="input" type="text" id="menu_id" name="id" placeholder="Menu ID.." readonly />
+          <input class="input" type="text" id="id" name="id" placeholder="Menu ID.." readonly />
         </div>
       </div>
-      <input type="hidden" id="menu_id" name="id" />
+      <input type="hidden" id="id" name="id" />
       <div class="field is-grouped">
         <div class="control">
           <input class="button is-link" type="submit" name="submit" value="Submit" />
@@ -103,51 +103,47 @@
     $('#menu-table').bootstrapTable({
       data: table_data,
       columns: [
-      {
-        field: 'id',
-<<<<<<< HEAD
-        title: 'Menu ID',
-=======
-        title: 'id',
->>>>>>> 2c0481e9344aa19048ec05c46b76ac4f40335960
-        visible: true
-      }, {
-        field: 'name',
-        title: 'Menu Name',
-        sortable: true
-      }, {
-        field: 'description',
-        title: 'Description',
-        sortable: true
-      }, {
-        field: 'price',
-        title: 'Price',
-        sortable: true
-      }, {
-        field: 'category',
-        title: 'Category',
-        sortable: true
-      }, {
-        field: 'availability',
-        title: 'Availability',
-        sortable: true
-      },{
-        field: 'ordered',
-        title: 'ordered',
-        sortable: true
-      }, {
-        field: 'image_url',
-        title: 'Image URL',
-        sortable: true,
-        formatter: function(value, row, index) {
-          return `<img src="${value}" alt="Menu Image" style="width: 100px; height: auto;">`;
-        }
-      }, {
-        field: 'operation',
-        title: 'Edit/Delete',
-        formatter: actionFormatter,
-        events: operateEvents
-      }],
+        {
+          field: 'id',
+          title: 'id',
+          visible: true
+        }, {
+          field: 'name',
+          title: 'Menu Name',
+          sortable: true
+        }, {
+          field: 'description',
+          title: 'Description',
+          sortable: true
+        }, {
+          field: 'price',
+          title: 'Price',
+          sortable: true
+        }, {
+          field: 'category',
+          title: 'Category',
+          sortable: true
+        }, {
+          field: 'availability',
+          title: 'Availability',
+          sortable: true
+        },{
+          field: 'ordered',
+          title: 'ordered',
+          sortable: true
+        }, {
+          field: 'image_url',
+          title: 'Image URL',
+          sortable: true,
+          formatter: function(value, row, index) {
+            return `<img src="${value}" alt="Menu Image" style="width: 100px; height: auto;">`;
+          }
+        }, {
+          field: 'operation',
+          title: 'Edit/Delete',
+          formatter: actionFormatter,
+          events: operateEvents
+        }],
       loadingTemplate: function () {
         return ''
       }
@@ -156,7 +152,9 @@
 
   $(document).ready(function () {
     (function () {
-      $.getJSON('/menu/menus', populate_table);
+      $.getJSON('/menus/get_all_menus', populate_table).fail(function() {
+        console.error("Failed to load menu data");
+      });
     })();
   });
 
@@ -222,7 +220,7 @@
 
   function prePopulateForm(row) {
     $('#addMenuForm')[0].reset();
-    $('#menu_id').val(row.name);
+    $('#id').val(row.name);
     $('#name').val(row.name);
     $('#description').val(row.description);
     $('#price').val(row.price);
@@ -237,12 +235,12 @@
       return false;
     }
     var url = '/menu/remove_menu';
-    var formData = { id: row.menu_id };
+    var formData = { id: row.id };
     $.post(url, formData, function (table_data) {
       refresh_table(table_data);
-      alert('Menu with ID ' + row.menu_id + ' has been deleted.');
+      alert('Menu with ID ' + row.id + ' has been deleted.');
     }).fail(function() {
-      alert('Failed to delete menu with ID ' + row.menu_id);
+      alert('Failed to delete menu with ID ' + row.id);
     });
   }
 
