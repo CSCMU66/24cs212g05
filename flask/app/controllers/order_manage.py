@@ -24,7 +24,7 @@ def order_create():
         result = request.form.to_dict()
 
         validated = True
-        valid_keys = ['is_employee', 'table_id', 'time', 'status', 'menu_list']
+        valid_keys = ['table_id', 'time', 'status', 'menu_list']
         validated_dict = dict()
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -91,7 +91,7 @@ def order_update():
         
         validated = True
         validated_dict = dict()
-        valid_keys = ['is_employee', 'id', 'status']
+        valid_keys = ['order_id', 'status']
 
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -112,7 +112,7 @@ def order_update():
         app.logger.debug(validated_dict)
         if validated:
             try:
-                orders = Order.query.get(validated_dict['id'])
+                orders = Order.query.get(validated_dict['order_id'])
                 orders.update_status(validated_dict['status'])
                 db.session.commit()
             except Exception as ex:
@@ -129,7 +129,7 @@ def order_delete():
 
         validated = True
         validated_dict = dict()
-        valid_keys = ['is_employee', 'id']
+        valid_keys = ['order_id']
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
             # screen of unrelated inputs
@@ -148,7 +148,7 @@ def order_delete():
             
         if validated:
             try:
-                orders = Order.query.get(validated_dict['id'])
+                orders = Order.query.get(validated_dict['order_id'])
                 db.session.delete(orders)
                 db.session.commit()
             except Exception as ex:

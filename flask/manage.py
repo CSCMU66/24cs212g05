@@ -1,6 +1,7 @@
 from flask.cli import FlaskGroup
 from app import app, db
 from werkzeug.security import generate_password_hash
+
 import jwt
 import datetime 
 import qrcode
@@ -143,7 +144,7 @@ def seed_db():
         total = 0
         # note menu_list key start at 0 but menus start at 1
         for key in menu_list:
-            app.logger.debug(f"{key} : {int(menus[key - 1]['price']) * menu_list[key]}")
+            # app.logger.debug(f"{key} : {int(menus[key - 1]['price']) * menu_list[key]}")
             total += int(menus[key - 1]['price']) * menu_list[key]
             plus_menu_ordered(key, menu_list[key])
             
@@ -157,7 +158,7 @@ def seed_db():
     a = [{1:2, 11:3}, {1:77, 11:9}, {4:2}]
     for i in a:
         temp = Order(table_id=12, 
-                         time=datetime.datetime.now(), 
+                         time=datetime.datetime.now(datetime.timezone.utc), 
                          menu_list=i)
         temp.change_price(cal_price(i))
         db.session.add(temp)
