@@ -8,6 +8,9 @@
 
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.20.2/bootstrap-table.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.20.2/bootstrap-table.min.css">
 
 </head>
 
@@ -49,20 +52,19 @@
         {% endblock %}
     </div>
 
-
-
     <script>
         // Navbar burger toggle for mobile
-        document.addEventListener('DOMContentLoaded', () => {
-            const burger = document.querySelector('.navbar-burger');
-            const menu = document.querySelector('#navbarMenu');
-
-            burger.addEventListener('click', () => {
-                burger.classList.toggle('is-active');
-                menu.classList.toggle('is-active');
+        $(document).ready(function () {
+            $('.navbar-burger').click(function () {
+                $(this).toggleClass('is-active');
+                $('#navbarAdmin').toggleClass('is-active');
             });
         });
     </script>
+
+    <!-- javascript for index.html -->
+    {% block extra_js %}
+    {% endblock %}
 </body>
 
 </html>

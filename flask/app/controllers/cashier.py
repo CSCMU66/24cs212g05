@@ -4,8 +4,6 @@ from app.controllers import menu_manage
 from app.controllers import employee_manage
 from app.controllers import order_manage
 
-from app.controllers.Dashboard import Revenue
-
 from flask import Flask, render_template
 from app import app
 
