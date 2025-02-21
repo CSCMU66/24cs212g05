@@ -194,6 +194,48 @@
       margin-right: 10px; /* เพิ่มระยะห่างจากข้อความ */
     }
 
+    /* Default grid view for larger screens */
+    /* .grid-view-item {
+      width: 30%;
+      margin-bottom: 16px;
+    } */
+
+    /* List view for mobile (screens smaller than 768px) */
+    /* @media (max-width: 768px) {
+      .grid-view-item {
+        width: 100%;
+      }
+    } */
+
+    /* Additional list view styles */
+    .list-view-item {
+      display: flex;
+      flex-wrap: wrap;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .list-view-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-right: 16px;
+      border-radius: 8px;
+    }
+
+    .list-view-item .item-details {
+      flex: 1;
+    }
+
+    .list-view-item .item-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     @media (max-width: 768px) {
       .toast {
         font-size: 1rem;
@@ -391,6 +433,10 @@
         });
       }
       function renderMenuByCategory(filteredItems = menuItems) {
+        const isMobile = window.innerWidth <= 768; // Check if it's mobile
+        const viewType = isMobile ? "list" : "grid";
+
+        console.log(viewType);
         const menuContainer = $("#menu-grid-container");
         menuContainer.empty();
 
@@ -402,7 +448,6 @@
 
         Object.keys(groupedByCategory).forEach((category) => {
           const categoryContainer = $("<div>").addClass("mb-4");
-
           const categoryTitle = $("<h3>")
             .addClass("text-danger font-weight-bold mb-3")
             .text(category);
@@ -411,10 +456,36 @@
           const gridContainer = $("<div>").addClass("row");
 
           groupedByCategory[category].forEach((item) => {
-            const cardDiv = $("<div>").addClass(
-              "col-md-4 col-sm-6 col-12 mb-4"
-            );
-            cardDiv.html(`
+            if (viewType === "list") {
+              // List View Item
+              const listItem = $("<div>").addClass("list-view-item");
+              listItem.html(`
+          <img src="${item.image_url}" alt="${item.name}" />
+          <div class="item-details">
+            <h5>${item.name}</h5>
+            <p>ราคา: ${item.price} บาท</p>
+            <label for="quantity-input-${item.id}">จำนวน:</label>
+            <input
+              type="number"
+              id="quantity-input-${item.id}"
+              class="form-control"
+              value="1"
+              min="1"
+              style="max-width: 100px;"
+            />
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-warning" onclick="addToCart(${item.id}, parseInt($('#quantity-input-${item.id}').val(), 10))">เพิ่มลงตะกร้า</button>
+            <button class="btn btn-outline-secondary" onclick="showProductPopup(${item.id})">ดูรายละเอียด</button>
+          </div>
+        `);
+              categoryContainer.append(listItem);
+            } else {
+              // Grid View Item
+              const cardDiv = $("<div>").addClass(
+                "col-md-4 col-sm-6 col-12 mb-4"
+              );
+              cardDiv.html(`
         <div class="card">
           <img src="${item.image_url}" class="card-img-top" alt="${item.name}">
           <div class="card-body">
@@ -435,10 +506,12 @@
           </div>
         </div>
       `);
-            gridContainer.append(cardDiv);
+              gridContainer.append(cardDiv);
+            }
           });
-
-          categoryContainer.append(gridContainer);
+          if (viewType === "grid") {
+            categoryContainer.append(gridContainer);
+          }
           menuContainer.append(categoryContainer);
         });
       }
@@ -610,6 +683,12 @@
       function showRemoveallFromCartToast() {
         $("#remove-all-toast").toast("show");
       }
+      $(window).resize(() => {
+        renderMenuByCategory(menuItems);
+      });
+
+      // Initial render
+      // renderMenuByCategory(menuItems);
     </script>
   </body>
 </html>
