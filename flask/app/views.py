@@ -170,3 +170,7 @@ def db_connection():
 @app.route('/cookingroom')
 def cookingroom():
     return render_template('cooking_page/base.html')
+
+@app.route('/waiter')
+def waiter():
+    return render_template('waiter_page/base.html')

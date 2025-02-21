@@ -115,12 +115,12 @@
             success: function (data) {
               $("#order-list").empty();
               const preparingOrders = data.filter(
-                (order) => order.status === "Preparing"
+                (order) => order.status === "Ready"
               );
 
               if (preparingOrders.length === 0) {
                 $("#order-list").append(
-                  '<div class="col-12"><h1 class="text-center">No orders are being prepared.</h1></div>'
+                  '<div class="col-12"><h1 class="text-center">No orders are being ready.</h1></div>'
                 );
               } else {
                 // Create 3 columns
@@ -184,7 +184,7 @@
           $.ajax({
             url: "/orders/update", // Your API endpoint for confirming the order
             method: "POST",
-            data: { order_id: orderId, status: 'Ready'},
+            data: { order_id: orderId, status: 'Served'},
             success: function (response) {
               alert(`Order ID ${orderId} confirmed successfully!`);
               fetchOrders(); // Refresh the order list after confirmation
