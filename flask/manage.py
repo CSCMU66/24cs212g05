@@ -127,7 +127,10 @@ def seed_db():
     ('สปาเก็ตตี้โบโลเนส', 'สปาเก็ตตี้ซอสโบโลเนส', 150, 'อาหารฝรั่ง', '/static/food_image/สปาเก็ตตี้โบโลเนส.jpg'),
     ('แซนด์วิชแฮมชีส', 'แซนด์วิชแฮมชีสกรอบ', 100, 'อาหารฝรั่ง', '/static/food_image/แซนด์วิชแฮมชีส.jpg'),
     ('ซีซาร์สลัด', 'ซีซาร์สลัดไก่กรอบ', 130, 'อาหารฝรั่ง', '/static/food_image/ซีซาร์สลัด.jpg'),
-    ('Fish and Chips', 'ปลาทอดกรอบเสิร์ฟพร้อมมันฝรั่งทอด', 190, 'อาหารฝรั่ง', '/static/food_image/Fish_and_Chips.jpg')
+    ('Fish and Chips', 'ปลาทอดกรอบเสิร์ฟพร้อมมันฝรั่งทอด', 190, 'อาหารฝรั่ง', '/static/food_image/Fish_and_Chips.jpg'),
+
+    #mk
+    ('Michael_jackson', 'ตายแล้ว', 17, 'hehe annie are u ok ', '/static/food_image/Michael_jackson.jpg')
     ]
 
 
