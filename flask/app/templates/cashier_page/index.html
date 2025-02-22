@@ -118,6 +118,7 @@
 
     function loadTable() {
         $.getJSON('/table/get_all_table', function (data) {
+            console.log("Receiving Data:", data);
             $('#table-list').bootstrapTable('destroy');
             $('#table-list').bootstrapTable({
                 data: data,
