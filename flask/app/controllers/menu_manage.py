@@ -6,7 +6,7 @@ from sqlalchemy.sql import text
 from app import app, db
 from app.models.menu import Menu
 
-UPLOAD_FOLDER = 'static/food_image'
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'food_image')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -43,9 +43,9 @@ def menu_list():
         if 'image_file' in request.files:
             file = request.files['image_file']
             if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
+                filename = validated_dict['name'] + '.jpg'
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                validated_dict['image_url'] = url_for('static', filename=f'food_image/{filename}')
+                validated_dict['image_url'] = url_for('static', filename=filename)
 
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
@@ -83,6 +83,10 @@ def menu_remove_menu():
         id_ = result.get('id', '')
         try:
             menu = Menu.query.get(id_)
+            if menu.image_url:
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(menu.image_url))
+                if os.path.exists(image_path):
+                    os.remove(image_path)
             db.session.delete(menu)
             db.session.commit()
         except Exception as ex:
