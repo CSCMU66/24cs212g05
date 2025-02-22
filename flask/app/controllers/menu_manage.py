@@ -46,10 +46,19 @@ def menu_list():
                 # ทำความสะอาดชื่อไฟล์และกำหนด path
                 filename = validated_dict['name'].replace(' ', '_') + '.jpg'
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'food_image', filename)
-                file.save(file_path)
                 
+                # ถ้ามี id => แก้ไขรายการเดิม
+                if id_:
+                    menu = Menu.query.filter_by(name=id_).first()
+                    if menu and menu.image_url:
+                        # ลบไฟล์ภาพเดิม
+                        old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(menu.image_url))
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+                
+                # บันทึกไฟล์ภาพใหม่
+                file.save(file_path)
                 validated_dict['image_url'] = f'/static/food_image/{filename}'
-
 
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
