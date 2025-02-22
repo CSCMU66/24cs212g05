@@ -82,6 +82,17 @@
     text-align: center;
     vertical-align: middle;
   }
+
+  /* Style for menu list in cells */
+  .table td[data-field="menu_list"] {
+    white-space: pre-wrap;
+  }
+
+  /* Style for status tags */
+  .table td .tag {
+    display: inline-block;
+    vertical-align: middle;
+  }
 </style>
 {% endblock %}
 
@@ -118,6 +129,7 @@
               <option value="Ready">Ready</option>
               <option value="Pending">Pending</option>
               <option value="Completed">Completed</option>
+              <option value="Preparing">Preparing</option>
             </select>
           </div>
         </div>
@@ -194,15 +206,15 @@
 
 {% block extra_js %}
 <script>
-  function populate_table(table_data) {
+  function populate_table(table_data, menuMap) {
     $("#order-table").bootstrapTable({
       data: table_data,
       columns: [
         { field: 'order_id', title: 'Order ID', sortable: true },
         { field: 'table_id', title: 'Table ID', sortable: true },
-        { field: 'status', title: 'Status', sortable: true },
+        { field: 'status', title: 'Status', sortable: true, formatter: statusFormatter },
         { field: 'total_price', title: 'Total Price', sortable: true },
-        { field: 'menu_list', title: 'Menu List', sortable: false, formatter: menuListFormatter },
+        { field: 'menu_list', title: 'Menu List', sortable: false, formatter: function (value) { return menuListFormatter(value, menuMap); } },
         { field: 'operation', title: 'Edit/Delete', formatter: actionFormatter, events: operateEvents }
       ],
       loadingTemplate: function () {
@@ -219,8 +231,29 @@
   }
 
   $(document).ready(function () {
-    $.getJSON("/orders/get_all_orders", populate_table).fail(function () {
-      console.error("Failed to load order data");
+    let menuMap = {};
+
+    // Load menu data from 2nd DB first
+    $.getJSON("/menus/get_all_menus", function (menus) {
+      menus.forEach((menu) => {
+        menuMap[menu.id] = menu.name; // Map menu.id to menu.name
+      });
+      // Load order data after menu data is loaded
+      $.getJSON("/orders/get_all_orders", function (orderData) {
+        populate_table(orderData, menuMap); // Pass menuMap to populate_table
+      }).fail(function (jqXHR, textStatus, error) {
+        console.error("Failed to load order data:", textStatus, error);
+        populate_table([], menuMap); // Load empty table if order data fails
+      });
+    }).fail(function (jqXHR, textStatus, error) {
+      console.error("Failed to load menu data:", textStatus, error);
+      // Load order data even if menu data fails
+      $.getJSON("/orders/get_all_orders", function (orderData) {
+        populate_table(orderData, {}); // Use empty menuMap if menu data fails
+      }).fail(function (jqXHR, textStatus, error) {
+        console.error("Failed to load order data:", textStatus, error);
+        populate_table([], {}); // Load empty table if both fail
+      });
     });
   });
 
@@ -228,39 +261,103 @@
     $("#order-table").bootstrapTable("load", table_data);
   }
 
-  function menuListFormatter(value) {
+  function menuListFormatter(value, menuMap) {
     let menuList = '';
     for (let menuId in value) {
-      menuList += `Menu ${menuId}: ${value[menuId]}<br>`;
+      const menuName = menuMap[menuId] || `Menu ${menuId} (Unknown)`; // Use menu name or menuId if not found
+      menuList += `${menuName}: ${value[menuId]}<br>`;
     }
     return menuList || 'No menus';
+  }
+
+  function statusFormatter(value) {
+    if (value === "Ready") {
+      return '<span class="tag is-success is-size-5">Ready</span>';
+    } else if (value === "Preparing") {
+      return '<span class="tag is-warning is-size-5">Preparing</span>';
+    } else if (value === "Pending") {
+      return '<span class="tag is-info is-size-5">Pending</span>';
+    } else if (value === "Completed") {
+      return '<span class="tag is-primary is-size-5">Completed</span>';
+    }
+    return '<span class="tag is-danger is-size-5">' + value + '</span>';
   }
 
   $("#addOrderForm").submit(function (event) {
     event.preventDefault();
 
     var formData = {
-      order_id: $("#order_id").val(),
-      table_id: $("#table_id").val(),
+      order_id: $("#order_id").val().trim(),
+      table_id: parseInt($("#table_id").val().trim()),
       status: $("#status").val(),
-      total_price: $("#total_price").val(),
-      menu_list: JSON.parse($("#menu_list").val())
+      total_price: parseFloat($("#total_price").val().trim()),
+      menu_list: JSON.parse($("#menu_list").val().trim())
     };
+
+    // Validate form data
+    if (!formData.order_id || !formData.table_id || !formData.status || !formData.total_price || !formData.menu_list) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    if (typeof formData.menu_list !== 'object' || Array.isArray(formData.menu_list)) {
+      alert("Invalid menu list format. Please enter a valid JSON object (e.g., {\"10\": 4, \"13\": 4}).");
+      return;
+    }
 
     var $form = $(this);
     var url = "/orders";
+    var method = "POST"; // Default to POST for adding new orders
 
-    $.post(url, formData, function (table_data) {
-      refresh_table(table_data);
-      clearForm();
-      toggleView();
-    }).fail(function (jqXHR, textStatus, error) {
-      console.error("Failed to submit order:", textStatus, error);
+    // Check if editing an existing order
+    if ($("#is_edit").length && $("#is_edit").val() === "true") {
+      url = `/orders/update`;
+      method = "PUT"; // Use PUT for updating existing orders
+    }
+
+    $.ajax({
+      url: url,
+      method: method,
+      data: JSON.stringify(formData),
+      contentType: "application/json",
+      success: function (table_data) {
+        try {
+          if (!Array.isArray(table_data) && typeof table_data !== "object") {
+            throw new Error("Invalid response format from server");
+          }
+          refresh_table(table_data);
+          clearForm();
+          toggleView();
+          alert((method === "POST" ? "Order created" : "Order updated") + " successfully!");
+        } catch (error) {
+          console.error("Error processing response:", error);
+          alert("An error occurred while processing the response. Please try again or contact support.");
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        let errorMessage = `Failed to ${method === "POST" ? "create" : "update"} order: ${textStatus}`;
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+          errorMessage += ` - ${jqXHR.responseJSON.message}`;
+        } else if (jqXHR.status === 401) {
+          errorMessage += " - Unauthorized. Please log in again.";
+        } else if (jqXHR.status === 403) {
+          errorMessage += " - Forbidden. You don't have permission.";
+        } else if (jqXHR.status === 500) {
+          errorMessage += " - Server error. Please try again later.";
+        } else {
+          errorMessage += ` - ${errorThrown || "Unknown error"}`;
+        }
+        console.error(errorMessage, jqXHR);
+        alert(errorMessage);
+      }
     });
   });
 
   function clearForm() {
     $("#addOrderForm")[0].reset();
+    if ($("#is_edit").length) {
+      $("#is_edit").val("false"); // Reset to add mode
+    }
   }
 
   function toggleView() {
@@ -300,6 +397,9 @@
     $("#status").val(row.status);
     $("#total_price").val(row.total_price);
     $("#menu_list").val(JSON.stringify(row.menu_list));
+    if ($("#is_edit").length) {
+      $("#is_edit").val("true"); // Set to edit mode
+    }
     toggleView();
   }
 
@@ -307,13 +407,24 @@
     if (!confirm("Delete order with ID " + row.order_id + "?")) {
       return false;
     }
-    var url = "/orders/remove_order";
+    var url = "/orders/delete";
     var formData = { order_id: row.order_id };
     $.post(url, formData, function (table_data) {
       refresh_table(table_data);
       alert("Order with ID " + row.order_id + " has been deleted.");
-    }).fail(function () {
-      alert("Failed to delete order with ID " + row.order_id);
+    }).fail(function (jqXHR, textStatus, error) {
+      let errorMessage = `Failed to delete order: ${textStatus}`;
+      if (jqXHR.status === 401) {
+        errorMessage += " - Unauthorized. Please log in again.";
+      } else if (jqXHR.status === 403) {
+        errorMessage += " - Forbidden. You don't have permission.";
+      } else if (jqXHR.status === 500) {
+        errorMessage += " - Server error. Please try again later.";
+      } else {
+        errorMessage += ` - ${error || "Unknown error"}`;
+      }
+      console.error(errorMessage, jqXHR);
+      alert(errorMessage);
     });
   }
 
