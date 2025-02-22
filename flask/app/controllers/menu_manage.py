@@ -6,7 +6,7 @@ from sqlalchemy.sql import text
 from app import app, db
 from app.models.menu import Menu
 
-UPLOAD_FOLDER = os.path.join(app.static_folder, 'food_image')
+UPLOAD_FOLDER = os.path.join(app.static_folder)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -43,9 +43,13 @@ def menu_list():
         if 'image_file' in request.files:
             file = request.files['image_file']
             if file and allowed_file(file.filename):
-                filename = validated_dict['name'] + '.jpg'
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                validated_dict['image_url'] = url_for('static', filename=filename)
+                # ทำความสะอาดชื่อไฟล์และกำหนด path
+                filename = validated_dict['name'].replace(' ', '_') + '.jpg'
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'food_image', filename)
+                file.save(file_path)
+                
+                validated_dict['image_url'] = f'/static/food_image/{filename}'
+
 
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
