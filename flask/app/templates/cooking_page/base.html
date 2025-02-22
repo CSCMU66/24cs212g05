@@ -140,9 +140,9 @@
                     '<div class="order-list-column"></div>'
                   );
                 }
-
+                const ordershow = preparingOrders.slice(0, 3);
                 // Distribute preparing orders across columns
-                preparingOrders.forEach(function (order, index) {
+                ordershow.forEach(function (order, index) {
                   let menuItems = "";
                   $.each(order.menu_list, function (menuId, quantity) {
                     const menuName = menuMap[menuId] || `Menu ID: ${menuId}`;
