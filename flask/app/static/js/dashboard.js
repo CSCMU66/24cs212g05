@@ -156,29 +156,58 @@ function fetchtotalMenuItems() {
 }
 
 function fetchTop5Menus() {
-  $.getJSON("/menus/get_all_menus", function (data) {
-    const sortedMenus = data.sort((a, b) => b.ordered - a.ordered);
-    const top5Menus = sortedMenus.slice(0, 5);
+  const selectedRange = $("#timeRange").val();
+  let apiUrl;
 
+  // กำหนด API URL ตามช่วงเวลาที่เลือก
+  switch (selectedRange) {
+    case "day":
+      apiUrl = "/daily_trending";
+      break;
+    case "week":
+      apiUrl = "/weekly_trending";
+      break;
+    case "month":
+      apiUrl = "/monthly_trending"; // ตัวอย่าง API สำหรับเดือน
+      break;
+    case "year":
+      apiUrl = "/yearly_trending";
+      break;
+    case "custom":
+      apiUrl = "/custom_trending"; // ตัวอย่าง API สำหรับช่วงเวลาที่กำหนดเอง
+      break;
+    default:
+      apiUrl = "/all_time_trending";
+      break;
+  }
+
+  // ดึงข้อมูลจาก API
+  $.getJSON(apiUrl, function (data) {
+    const top5Menus = data.slice(0, 5); // เลือกเฉพาะ 5 อันดับแรก
     let htmlContent = '';
+
+    // สร้าง HTML สำหรับแสดงผลเมนู
     top5Menus.forEach((menu, index) => {
       htmlContent += `
         <div class="media">
           <div class="media-left">
             <figure class="image is-128x128">
-              <img src="${menu.image_url}" alt="${menu.name}" style="width: 100%; height: auto;">
+              <img src="${menu.image_url}" alt="${menu.menu_name}" style="width: 100%; height: auto;">
             </figure>
           </div>
           <div class="media-content">
-            <p class="title is-4 has-text-weight-bold">${index + 1}. ${menu.name}</p>
-            <p class="subtitle is-6 has-text-grey-dark">จำนวนการสั่ง: <strong>${menu.ordered} ครั้ง</strong></p>
-            <p class="subtitle is-6 has-text-grey-dark">ราคา: <strong>฿${menu.price}</strong></p>
+            <p class="title is-4 has-text-weight-bold">${index + 1}. ${menu.menu_name}</p>
+            <p class="subtitle is-6 has-text-grey-dark">จำนวนการสั่ง: <strong>${menu.total_sold} ครั้ง</strong></p>
           </div>
         </div>
       `;
     });
 
+    // แสดงผลใน #top5Menus
     $("#top5Menus").html(htmlContent);
+  }).fail(function (jqXHR, textStatus, errorThrown) {
+    console.error("Error fetching trending menus:", textStatus, errorThrown);
+    $("#top5Menus").html("<p>เกิดข้อผิดพลาดในการดึงข้อมูลเมนูเทรนด์</p>");
   });
 }
 
@@ -359,16 +388,17 @@ function fetchAndDrawRevenueChart() {
 }
 
 $(document).ready(function () {
-  // ตรวจสอบว่า canvas พร้อมใช้งานก่อนเรียก
-  if (document.getElementById("revenueChart")) {
-    fetchAndDrawRevenueChart();
-  }
+  // เรียกฟังก์ชันเริ่มต้นเมื่อโหลดหน้า
+  fetchTop5Menus();
 
-  $("#yearSelector").on("change", function () {
-    fetchAndDrawRevenueChart();
+  // เมื่อผู้ใช้เลือกช่วงเวลา
+  $("#timeRange").change(function () {
+    fetchTop5Menus();
   });
 
-  $("#updateChart").click(function () {
-    fetchAndDrawRevenueChart();
+  // เมื่อผู้ใช้กดปุ่ม Filter
+  $("#filterButton").click(function () {
+    fetchTop5Menus();
   });
 });
+

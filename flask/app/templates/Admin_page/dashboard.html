@@ -40,8 +40,6 @@
       </div>
     </div>
   </div>
-  
-  
 </div>
 
 
@@ -93,12 +91,14 @@
 </div>
 
 <div class="row mt-5 is-flex is-justify-content-space-between">
-  <div class="column is-half">
-    <div class="card">
-      <div class="card-content">
-        <h2 class="title is-4">เทรนดิ้ง เมนู Top 5</h2>
-        <div id="top5Menus" class="content">
-          <!-- ข้อมูลเมนู top 5 -->
+  <div class="row mt-5">
+    <div class="column is-half">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-4">เมนูเทรนด์ Top 5</h2>
+          <div id="top5Menus" class="content">
+            <!-- ข้อมูลเมนู top 5 จะถูกแสดงที่นี่ -->
+          </div>
         </div>
       </div>
     </div>
@@ -122,6 +122,5 @@
   rel="stylesheet"
 />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
