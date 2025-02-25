@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        .invoice-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .details {
+            margin-bottom: 20px;
+        }
+
+        .items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items th,
+        .items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .total {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .download-btn {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-container">
+        <h2>Invoice</h2>
+        <div class="details">
+            <p><strong>Table No.</strong>{{table_id}}</p>
+            <p><strong>Date:</strong>1</p>
+            <p><strong>Customer:</strong>1</p>
+        </div>
+
+        <div>
+            <span id="qrcode">{{qrcode}}</span>
+        </div>
+
+        <p class="total">Total: 1</p>
+
+        <a href="cashier/download" class="download-btn">Print Invoice</a>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var qrCodeValue = $("#qrcode").text();
+
+            $("#qrcode").html(qrcodeFormatter(qrCodeValue));
+        });
+
+        function qrcodeFormatter(value) {
+            console.log(value.replace("app/", "/"))
+            return `<img src="${value.replace("app/", "/")}" alt="QR Image" style="width: 100px; height: auto;">`;
+
+        }
+
+    </script>
+</body>
+
+</html>
