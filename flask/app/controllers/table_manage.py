@@ -41,7 +41,6 @@ def table_create():
             if not value or value == 'undefined':
                 validated = False
                 break
-            
         if validated:
             try:
                 db_allTable = Tables.query.all()
@@ -136,13 +135,12 @@ def table_delete():
             if not value or value == 'undefined':
                 validated = False
                 break
-        
             validated_dict[key] = value
             
         if validated:
             try:
                 table = Tables.query.get(validated_dict['table_id'])
-                db.session.delete(table)
+                table.update_status('Disable')
                 db.session.commit()
             except Exception as ex:
                 app.logger.error(f"Error delete: {ex}")

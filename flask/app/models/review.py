@@ -13,3 +13,8 @@ class Review(db.Model, SerializerMixin):
         self.name = name
         self.review = review
         self.star = star
+
+    def update(self, name, review, star):
+        self.name = name
+        self.review = review
+        self.star = star

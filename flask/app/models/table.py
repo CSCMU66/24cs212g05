@@ -15,7 +15,7 @@ class Tables(db.Model, SerializerMixin):
     count = db.Column(db.Integer, nullable=False)
 
     '''
-    สถานะโต๊ะ ("Available", "Reserved", "Paid")
+    สถานะโต๊ะ ("Available","Occupied", "Reserved", "Paid", "Disable")
     '''
 
     def __init__(self, qrcode):
