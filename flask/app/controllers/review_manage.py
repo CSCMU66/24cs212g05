@@ -51,3 +51,77 @@ def review_create():
                 raise
             
     return reviews_list()
+
+@app.route('/reviews/update', methods=('GET', 'POST'))
+def review_update():
+    app.logger.debug("review - UPDATE")
+    if request.method == 'POST':
+        
+        result = request.form.to_dict()
+        app.logger.debug(result)
+        valid_keys = ['review_id', 'name', 'star', 'review']
+        validated = True
+        validated_dict = dict() 
+        for key in result:
+            app.logger.debug(f"{key}: {result[key]}")
+            # screen of unrelated inputs
+            if key not in valid_keys:
+                continue
+
+            value = result[key].strip()
+            if not value or value == 'undefined':
+                validated = False
+                break
+
+            validated_dict[key] = value
+        app.logger.debug(validated_dict)
+        if validated:
+            try:
+                review = Review.query.get(validated_dict['review_id'])
+                review.update(name=validated_dict['name'],
+                              review=validated_dict['review'],
+                              star=validated_dict['star'])
+                
+                db.session.commit()
+                
+            except Exception as ex:
+                app.logger.error(f"Error create new review: {ex}")
+                raise
+            
+    return reviews_list()
+
+@app.route('/reviews/delete', methods=('GET', 'POST'))
+def review_delete():
+    app.logger.debug("review - DELETE")
+    if request.method == 'POST':
+        
+        result = request.form.to_dict()
+        app.logger.debug(result)
+        valid_keys = ['review_id']
+        validated = True
+        validated_dict = dict() 
+        for key in result:
+            app.logger.debug(f"{key}: {result[key]}")
+            # screen of unrelated inputs
+            if key not in valid_keys:
+                continue
+
+            value = result[key].strip()
+            if not value or value == 'undefined':
+                validated = False
+                break
+
+            validated_dict[key] = value
+        app.logger.debug(validated_dict)
+        if validated:
+            try:
+                review = Review.query.get(validated_dict['review_id'])
+                db.session.delete(review)
+                
+                db.session.commit()
+                
+            except Exception as ex:
+                app.logger.error(f"Error create new review: {ex}")
+                raise
+            
+    return reviews_list()

@@ -27,7 +27,7 @@ def payment_create():
         result = request.form.to_dict()
 
         validated = True
-        valid_keys = ['order_id', 'payment_method', 'payment_time', 'amount']
+        valid_keys = ['table_id', 'payment_method', 'payment_time', 'amount']
         validated_dict = dict()
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -39,9 +39,6 @@ def payment_create():
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
-                break
-            if key == 'is_employee' and result[key].lower() != "true":
-                validated = False    
                 break
             validated_dict[key] = value
             
@@ -58,7 +55,6 @@ def payment_create():
             
     return payment_list()
 
-
 @app.route('/payment/update', methods=('GET', 'POST'))
 def payment_update():
     app.logger.debug("Payment - UPDATE")
@@ -67,7 +63,7 @@ def payment_update():
         result = request.form.to_dict()
 
         validated = True
-        valid_keys = ['payment_id', 'order_id', 'payment_method', 'payment_time', 'amount']
+        valid_keys = ['payment_id', 'table_id', 'payment_method', 'payment_time', 'amount']
         validated_dict = dict()
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -79,9 +75,6 @@ def payment_update():
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
-                break
-            if key == 'is_employee' and result[key].lower() != "true":
-                validated = False    
                 break
             validated_dict[key] = value
             
@@ -122,9 +115,6 @@ def payment_delete():
             if not value or value == 'undefined':
                 validated = False
                 break
-            if key == 'is_employee' and result[key].lower() != "true":
-                validated = False    
-                break
             validated_dict[key] = value
             
         if validated:
@@ -138,3 +128,32 @@ def payment_delete():
                 raise
             
     return payment_list()
+
+@app.route('/payment/create_slip', methods=('GET', 'POST'))
+def slip_create():
+    app.logger.debug("Payment - CREATE SLIP")
+    if request.method == 'POST':
+        result = request.form.to_dict()
+        table_id = result.get('table_id', '')
+        app.logger.debug(table_id)
+        db_order = db.session.query(Order).filter(Order.table_id == table_id).all() 
+        orders = list(map(lambda x: x.to_dict(), db_order))
+        menu_list = dict()
+        subtotal = 0
+        for order in orders:
+            subtotal += order['total_price']
+            menu_list = merge_dict(menu_list, order['menu_list'])
+                
+        total = subtotal * 107 / 100
+        temp = {'total': total, 'subtotal' : subtotal, 'menu_list': menu_list}
+        return temp
+
+def merge_dict(A, B):
+    temp = dict(A)
+    for b in B:
+        if b in temp:
+            temp[b] += B[b]
+        else:
+            temp[b] = B[b]
+    return temp
+    

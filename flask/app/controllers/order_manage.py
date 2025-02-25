@@ -132,14 +132,14 @@ def cal_price(menu_list):
             app.logger.debug(type(menus[int(key) - 1]['price']))
             app.logger.debug(f"{key} : {int(menus[int(key) - 1]['price']) * menu_list[key]}")
             total += int(menus[int(key) - 1]['price']) * menu_list[key]
-            # plus_menu_ordered(key, menu_list[key])
+            plus_menu_ordered(key, menu_list[key])
             
         return total
 
 def plus_menu_ordered(menu_id, amount):
     menu = Menu.query.get(menu_id)
     menu.update_ordered(amount)
-    db.session.commit()
+    # db.session.commit()
 
 
 

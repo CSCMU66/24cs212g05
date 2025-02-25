@@ -1,0 +1,46 @@
+table 
+    table_id = int ID ของแต่ละโต๊ะใน DB
+    qrcode =  str pathของ QRcode ของแต่ละโต๊ะ จะถูกสร้างตอน Occupied
+    status =  str สถานะโต๊ะ ("Available","Occupied", "Reserved", "Paid")
+    count = int จำนวนที่โต๊ะถูกใช้ เริ่มที่ 0 เพิ่มตอน Available
+
+order
+    order_id = int ID ของแต่ละ order ใน DB
+    table_id = int ID ของโต๊ะ แสดงว่าเป็น order ของโต๊ะไหน
+    order_time = datetime แสดงเวลาสั่ง order
+    status = str (Preparing, Ready, Served, Paid)
+    menu_list = {menu_id : amount}
+    total_price = float ราคารวมของ order นั้นๆ
+
+menu
+    id = int id ของแต่ละ menu
+    name = str ชื่อเมนู
+    description = str ตามชื่อ
+    price = int
+    category = str
+    image_url = str path ของรูป
+    availability = str พร้อมทำรึปล่าว
+    ordered = int ถูกสั่งไปแล้วกี่รอบ
+
+review
+    review_id = int id review
+    name = str ชื่อคน review
+    review = str ข้อความ review
+    star = int จำนวนดาว
+
+payment
+    payment_id = int id ของแต่ละ payment
+    table_id = int id ของโต๊ะที่จ่าย
+    payment_method = str จ่ายด้วยวิธีไหน
+    payment_time = datetime เวลาจ่าย
+    amount = float ราคาที่จ่าย
+
+employee
+    em_id = int id ของแต่ละคน
+    username = str 
+    password= str hash
+    firstname = str
+    lastname = str or none มีไม่มีก็ได้
+    phone = str แบบมีขีด
+    role = str
+
