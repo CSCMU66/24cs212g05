@@ -15,6 +15,7 @@ $(document).ready(function () {
   fetchtotalMenuItems();
   fetchTop5Menus();
   fetchAndDrawRevenueChart();
+  fetchLatestReviews(); 
 
   // แก้ไข: เพิ่มการสลับแสดง Filter Container
   $("#toggleFilterButton").click(function () {
@@ -25,6 +26,7 @@ $(document).ready(function () {
   $("#filterButton").click(function () {
     fetchTotalSale();
     fetchTotalOrder();
+    fetchTop5Menus(); // เพิ่มการอัปเดต Top 5 Menus เมื่อกดปุ่ม Filter
   });
 
   $("#resetButton").click(function () {
@@ -32,6 +34,7 @@ $(document).ready(function () {
     $("#endDate").val("");
     fetchTotalSale();
     fetchTotalOrder();
+    fetchTop5Menus(); // เพิ่มการอัปเดต Top 5 Menus เมื่อกดปุ่ม Reset
   });
 
   $("#timeRange").change(function () {
@@ -100,17 +103,20 @@ $(document).ready(function () {
     // เรียกฟังก์ชันเพื่ออัปเดตข้อมูล
     fetchTotalSale();
     fetchTotalOrder();
+    fetchTop5Menus(); // เพิ่มการอัปเดต Top 5 Menus เมื่อเปลี่ยนช่วงเวลา
   });
 });
 
 function fetchTotalSale() {
-  const startDate = $("#startDate").val() || new Date().toISOString().split("T")[0];
-  const endDate = $("#endDate").val() || new Date().toISOString().split("T")[0];
+  const selectedRange = $("#timeRange").val(); // ตรวจสอบช่วงเวลาที่เลือก
+  const startDate = $("#startDate").val();
+  const endDate = $("#endDate").val();
 
   $.getJSON("/payment/get_all_payment", function (data) {
     let filteredData = data;
 
-    if (startDate && endDate) {
+    // กรองข้อมูลตามวันที่เฉพาะเมื่อไม่ใช่โหมด "All Time"
+    if (selectedRange !== "all_time" && startDate && endDate) {
       filteredData = data.filter((payment) => {
         const paymentTime = new Date(payment.payment_time);
         const start = new Date(startDate);
@@ -119,22 +125,30 @@ function fetchTotalSale() {
       });
     }
 
+    // คำนวณยอดขายรวม
     const totalSale = filteredData.reduce(
       (acc, pay) => acc + (Number(pay.amount) || 0),
       0
     );
+
+    // แสดงผลยอดขายรวม
     $("#totalSale").text(`฿ ${totalSale.toLocaleString()}`);
+  }).fail(function (jqXHR, textStatus, errorThrown) {
+    console.error("Error fetching payment data:", textStatus, errorThrown);
+    $("#totalSale").text("เกิดข้อผิดพลาดในการดึงข้อมูล");
   });
 }
 
 function fetchTotalOrder() {
-  const startDate = $("#startDate").val() || new Date().toISOString().split("T")[0];
-  const endDate = $("#endDate").val() || new Date().toISOString().split("T")[0];
+  const selectedRange = $("#timeRange").val();
+  const startDate = $("#startDate").val();
+  const endDate = $("#endDate").val();
 
   $.getJSON("/orders/get_all_orders", function (data) {
     let filteredData = data;
 
-    if (startDate && endDate) {
+    // กรองข้อมูลตามวันที่เฉพาะเมื่อไม่ใช่โหมด "All Time"
+    if (selectedRange !== "all_time" && startDate && endDate) {
       filteredData = data.filter((order) => {
         const orderTime = new Date(order.order_time);
         const start = new Date(startDate);
@@ -145,6 +159,33 @@ function fetchTotalOrder() {
 
     const totalOrder = filteredData.length;
     $("#totalOrder").text(`${totalOrder.toLocaleString()}`);
+    
+    // คำนวณ Average Order Value
+    if (totalOrder > 0) {
+      $.getJSON("/payment/get_all_payment", function (paymentData) {
+        let filteredPaymentData = paymentData;
+        
+        // กรองข้อมูลการชำระเงินตามวันที่
+        if (selectedRange !== "all_time" && startDate && endDate) {
+          filteredPaymentData = paymentData.filter((payment) => {
+            const paymentTime = new Date(payment.payment_time);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            return paymentTime >= start && paymentTime <= end;
+          });
+        }
+        
+        const totalSale = filteredPaymentData.reduce(
+          (acc, pay) => acc + (Number(pay.amount) || 0),
+          0
+        );
+        
+        const avgOrderValue = totalSale / totalOrder;
+        $("#avgOrderValue").text(`฿ ${avgOrderValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+      });
+    } else {
+      $("#avgOrderValue").text("฿ 0.00");
+    }
   });
 }
 
@@ -157,6 +198,8 @@ function fetchtotalMenuItems() {
 
 function fetchTop5Menus() {
   const selectedRange = $("#timeRange").val();
+  const startDate = $("#startDate").val();
+  const endDate = $("#endDate").val();
   let apiUrl;
 
   // กำหนด API URL ตามช่วงเวลาที่เลือก
@@ -168,46 +211,63 @@ function fetchTop5Menus() {
       apiUrl = "/weekly_trending";
       break;
     case "month":
-      apiUrl = "/monthly_trending"; // ตัวอย่าง API สำหรับเดือน
+      apiUrl = "/monthly_trending";
       break;
     case "year":
       apiUrl = "/yearly_trending";
       break;
     case "custom":
-      apiUrl = "/custom_trending"; // ตัวอย่าง API สำหรับช่วงเวลาที่กำหนดเอง
+      // ใช้ custom API endpoint พร้อมส่งพารามิเตอร์วันที่
+      if (startDate && endDate) {
+        apiUrl = `/custom_trending?start_date=${startDate}&end_date=${endDate}`;
+        console.log(apiUrl);
+      } else {
+        apiUrl = "/all_time_trending";
+      }
+      break;
+    case "all_time":
+      apiUrl = "/all_time_trending";
       break;
     default:
       apiUrl = "/all_time_trending";
       break;
   }
 
+  // แสดง loading indicator
+  $("#top5OrderMenus").html('<div class="has-text-centered"><p>กำลังโหลดข้อมูล...</p></div>');
+
   // ดึงข้อมูลจาก API
   $.getJSON(apiUrl, function (data) {
-    const top5Menus = data.slice(0, 5); // เลือกเฉพาะ 5 อันดับแรก
+    const top5OrderMenus = data.slice(0, 5); // เลือกเฉพาะ 5 อันดับแรก
     let htmlContent = '';
 
-    // สร้าง HTML สำหรับแสดงผลเมนู
-    top5Menus.forEach((menu, index) => {
-      htmlContent += `
-        <div class="media">
-          <div class="media-left">
-            <figure class="image is-128x128">
-              <img src="${menu.image_url}" alt="${menu.menu_name}" style="width: 100%; height: auto;">
-            </figure>
+    if (top5OrderMenus.length === 0) {
+      htmlContent = '<div class="has-text-centered"><p>ไม่พบข้อมูลเมนูในช่วงเวลาที่เลือก</p></div>';
+    } else {
+      // สร้าง HTML สำหรับแสดงผลเมนู
+      top5OrderMenus.forEach((menu, index) => {
+        htmlContent += `
+          <div class="media">
+            <div class="media-left">
+              <figure class="image is-128x128">
+                <!-- Apply CSS styles for cropping and centering -->
+                <img src="${menu.image_url}" alt="${menu.menu_name}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+              </figure>
+            </div>
+            <div class="media-content">
+              <p class="title is-4 has-text-weight-bold">${index + 1}. ${menu.menu_name}</p>
+              <p class="subtitle is-6 has-text-grey-dark">จำนวนการสั่ง: <strong>${menu.total_sold} ครั้ง</strong></p>
+            </div>
           </div>
-          <div class="media-content">
-            <p class="title is-4 has-text-weight-bold">${index + 1}. ${menu.menu_name}</p>
-            <p class="subtitle is-6 has-text-grey-dark">จำนวนการสั่ง: <strong>${menu.total_sold} ครั้ง</strong></p>
-          </div>
-        </div>
-      `;
-    });
+        `;
+      });
+    }
 
-    // แสดงผลใน #top5Menus
-    $("#top5Menus").html(htmlContent);
+    // แสดงผลใน #top5OrderMenus
+    $("#top5OrderMenus").html(htmlContent);
   }).fail(function (jqXHR, textStatus, errorThrown) {
     console.error("Error fetching trending menus:", textStatus, errorThrown);
-    $("#top5Menus").html("<p>เกิดข้อผิดพลาดในการดึงข้อมูลเมนูเทรนด์</p>");
+    $("#top5OrderMenus").html("<p>เกิดข้อผิดพลาดในการดึงข้อมูลเมนูเทรนด์</p>");
   });
 }
 
@@ -386,13 +446,46 @@ function fetchAndDrawRevenueChart() {
     console.error("Error fetching data:", textStatus, errorThrown);
   });
 }
+function fetchLatestReviews() {
+  $.getJSON("/reviews/get_all_reviews", function (reviewData) {
+    console.log(reviewData)
+    const reviewContainer = $("#ReviewRes");
+    reviewContainer.empty();
+    let htmlContent = '';
+    let count = 0;
+    let reviews = reviewData.reviews.slice().reverse();
+    for (i of reviews){
+      if(count >= 5) break;
+      count++;
+          htmlContent += 
+            `<div class="media">
+               <div class="media-content">
+                 <p class="subtitle is-6">โดย: ${i.name}</p>
+              <p class="subtitle is-6">คะแนน: ${i.star}</p>
+              <p class="subtitle is-6">รีวิว: ${i.review}</p>
+               </div>
+             </div>
+             <hr>`;
+    }
+
+    reviewContainer.html(htmlContent);
+  });
+}
 
 $(document).ready(function () {
   // เรียกฟังก์ชันเริ่มต้นเมื่อโหลดหน้า
+  fetchLatestReviews();
   fetchTop5Menus();
 
   // เมื่อผู้ใช้เลือกช่วงเวลา
   $("#timeRange").change(function () {
+    if ($(this).val() === "custom") {
+      $("#startDateContainer").show();
+      $("#endDateContainer").show();
+    } else {
+      $("#startDateContainer").hide();
+      $("#endDateContainer").hide();
+    }
     fetchTop5Menus();
   });
 
@@ -400,5 +493,5 @@ $(document).ready(function () {
   $("#filterButton").click(function () {
     fetchTop5Menus();
   });
+  
 });
-

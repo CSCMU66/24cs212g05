@@ -18,11 +18,12 @@
           <div class="control">
             <div class="select">
               <select id="timeRange">
-                <option value="day" selected>Day</option>
+                <option value="day">Day</option>
                 <option value="week">Week</option>
                 <option value="month">Month</option>
                 <option value="year">Year</option>
-                <option value="custom">Custom</option> <!-- เพิ่มตัวเลือก Custom -->
+                <!-- <option value="custom">Custom</option> -->
+                <option value="all_time">All Time</option>
               </select>
             </div>
           </div>
@@ -90,20 +91,32 @@
   </div>
 </div>
 
-<div class="row mt-5 is-flex is-justify-content-space-between">
-  <div class="row mt-5">
+<div class="row mt-5">
+  <div class="columns mt-5">
     <div class="column is-half">
       <div class="card">
         <div class="card-content">
           <h2 class="title is-4">เมนูเทรนด์ Top 5</h2>
-          <div id="top5Menus" class="content">
+          <div id="top5OrderMenus" class="content">
             <!-- ข้อมูลเมนู top 5 จะถูกแสดงที่นี่ -->
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="column is-half">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-4">รีวิวล่าสุด</h2>
+          <div id="ReviewRes" class="content">
+            <!-- ข้อมูลรีวิวล่าสุดจะถูกแสดงที่นี่ -->
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 
 <div class="row mt-5">
   <div class="column is-full">

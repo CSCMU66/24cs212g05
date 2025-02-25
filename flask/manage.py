@@ -163,17 +163,28 @@ def seed_db():
         menu.update_ordered(amount)
         db.session.commit()
     
+    def random_date(start_year=2023):
+        start_date = datetime.date(start_year, 1, 1)
+        end_date = datetime.date(start_year+6, 5, 5)
+        delta = end_date - start_date
+        random_days = random.randint(0, delta.days)
+        random_date = start_date + datetime.timedelta(days=random_days)
+        return random_date
+
+    # Generate a large list of orders with a random date between 2023 and today
     large_list = [{random.randint(1, 20): random.randint(1, 10) for _ in range(random.randint(1, 5))} for _ in range(700)]
+
     for menu_list in large_list:
         temp = Order(
             table_id=random.randint(1, 20),
-            time=datetime.datetime.now(datetime.timezone.utc),
+            time=random_date(),  
             menu_list=menu_list
         )
         temp.change_price(cal_price(menu_list))
         db.session.add(temp)
-        
+
     db.session.commit()
+
 
     #?-------------------------------------------------------------------------
     # สร้างข้อมูลพนักงาน
@@ -187,10 +198,10 @@ def seed_db():
 
     #?-------------------------------------------------------------------------
     payment_methods = ["cash", "credit_card", "paypal", "bank_transfer"]
-    start_time = datetime.datetime(2023, 1, 1, 0, 0, 0)  # เริ่มตั้งแต่ปี 2015
-    num_payments = 700 # สุ่ม 700 records
+    start_time = datetime.datetime(2020, 1, 1, 0, 0, 0)  # เริ่มตั้งแต่ปี 2015
+    num_payments = 1000 # สุ่ม 700 records
 
-    years = 3  # กำหนดจำนวนปีที่ต้องการ
+    years = 6 # กำหนดจำนวนปีที่ต้องการ
 
     sample_payments = [
         [

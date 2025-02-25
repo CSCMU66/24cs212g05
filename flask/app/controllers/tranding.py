@@ -1,9 +1,9 @@
 import json
 from datetime import datetime, timedelta
+from flask import request, jsonify
 from app import app
 from app.models.menu import Menu
 from app.models.order import Order
-from flask import jsonify
 
 
 def parse_menu_list(menu_list):
@@ -62,6 +62,16 @@ def get_weekly_trending():
     return jsonify(get_trending_menu(start_date, end_date))
 
 
+@app.route('/monthly_trending')
+def get_monthly_trending():
+    """
+    Trending menus for the current month.
+    """
+    now = datetime.now()
+    start_date = datetime(now.year, now.month, 1) 
+    end_date = now  
+    return jsonify(get_trending_menu(start_date, end_date))
+
 @app.route('/yearly_trending')
 def get_yearly_trending():
     """
@@ -79,5 +89,19 @@ def get_all_time_trending():
     All-time trending menus.
     """
     return jsonify(get_trending_menu())
+
+
+@app.route('/custom_trending')
+def get_custom_trending():
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d") if start_date_str else None
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") if end_date_str else None
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+
+    return jsonify(get_trending_menu(start_date, end_date))
 
 #!-------------------------------------------------------------------------------------------------
