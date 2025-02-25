@@ -10,6 +10,7 @@ import datetime
 from app.models.table import Tables
 from app.models.order import Order
 from app.models.payment import Payment
+from app.models.menu import Menu
 
 @app.route('/payment/get_all_payment')
 def payment_list():
@@ -139,13 +140,18 @@ def slip_create():
         db_order = db.session.query(Order).filter(Order.table_id == table_id).all() 
         orders = list(map(lambda x: x.to_dict(), db_order))
         menu_list = dict()
+        sum_list = dict()
         subtotal = 0
         for order in orders:
             subtotal += order['total_price']
             menu_list = merge_dict(menu_list, order['menu_list'])
-                
-        total = subtotal * 107 / 100
-        temp = {'total': total, 'subtotal' : subtotal, 'menu_list': menu_list}
+
+        for menu_id in menu_list:
+            menu = get_menu_dict(menu_id)
+            sum_list[menu['name']] = menu_list[menu_id] * menu['price']
+        
+        total = subtotal * 7 / 100
+        temp = {'vat_7%': total, 'total' : subtotal, 'menu_list': menu_list, 'sum_price': sum_list}
         return temp
 
 def merge_dict(A, B):
@@ -156,4 +162,8 @@ def merge_dict(A, B):
         else:
             temp[b] = B[b]
     return temp
-    
+
+def get_menu_dict(id):
+    db_menu = Menu.query.get(id)
+    menu = db_menu.to_dict()
+    return menu
