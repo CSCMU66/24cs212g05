@@ -30,19 +30,17 @@ def table_create():
         result = request.form.to_dict()
 
         validated = True
-        valid_keys = []
+        valid_keys = ['status']
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
             # screen of unrelated inputs
             if key not in valid_keys:
                 continue
 
-
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
                 break
-
         if validated:
             try:
                 db_allTable = Tables.query.all()
