@@ -4,6 +4,7 @@ from app import app
 from app import db
 from flask import (jsonify, render_template,
                   request, url_for, flash, redirect)
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.controllers import Admin
 from app.models.employee import Employee
@@ -16,7 +17,7 @@ def em_list():
         id_ = result.get('id', '')  # รับค่า id จากฟอร์ม
         validated = True
         validated_dict = dict()
-        valid_keys = ['firstname', 'lastname', 'phone', 'role']
+        valid_keys = ['username', 'password', 'firstname', 'lastname', 'phone', 'role']
 
         # Validate the input
         for key in result:
@@ -28,6 +29,16 @@ def em_list():
                 validated = False
                 break
             validated_dict[key] = value
+        
+        user = Employee.query.filter_by(username=validated_dict['username']).with_for_update().first()
+ 
+        if user:
+            flash('username address already exists')
+            # if the user doesn't exist or password is wrong, reload the page
+            return render_template('Admin_page/login.html')
+        
+        validated_dict['password'] = generate_password_hash(validated_dict['password'],method='sha256')
+
 
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))

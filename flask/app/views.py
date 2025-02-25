@@ -160,7 +160,8 @@ def decode_jwt(token):
 
 @app.route('/')
 def home():
-    return render_template('order_page/index.html')
+    # return render_template('order_page/index.html')
+    return 'ready'
 
 @app.route('/index')
 def index():
