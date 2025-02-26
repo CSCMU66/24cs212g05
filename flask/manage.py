@@ -22,6 +22,7 @@ from app.models.employee import Employee
 from app.models.table import Tables
 from app.models.order import Order
 from app.models.review import Review
+from app.models.store import Store
 # from app.models.employee import AuthUser
 
 '''
@@ -222,12 +223,16 @@ def seed_db():
     for order_id, payment_method, payment_time, amount in sample_payments:
         db.session.add(Payment(table_id=order_id, payment_method=payment_method, payment_time=payment_time, amount=amount))
 
-    #?-------------------------------------------------------------------------
-    # เพิ่มเติม Contact 
-    
     db.session.commit()
 
-    db.session.add(Review(name='uiia', star=5, review='uiiauiiia'))
+    #?-------------------------------------------------------------------------
+    db.session.add(Review(name='people1', star=5, review='แซ่บหลาย'))
+    db.session.add(Review(name='people2', star=5, review='เฮาคนสุพัน'))
+    db.session.add(Review(name='people-', star=5, review='that crazy i can  eat MJ WTH'))
+    db.session.commit()
+    #?-------------------------------------------------------------------------
+
+    db.session.add(Store(name = "ปลาดุกทอด", vat = 7.0, service_charge = 0 , Max_Orders_per_Round = 5, Max_Food_Quantity_per_Order = 100))
     db.session.commit()
 
 @cli.command("secret_key")
