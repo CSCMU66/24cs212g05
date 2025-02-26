@@ -23,12 +23,13 @@ def em_list():
         validated = True
         validated_dict = dict()
         valid_keys = ['username', 'password', 'firstname', 'lastname', 'phone', 'role']
+        print("ผ่าน valid_keys = ['username', 'password', 'firstname', 'lastname', 'phone', 'role']")
 
         # Validate the input
         for key in result:
             if key not in valid_keys:
                 continue
-
+            print(result[key])
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
@@ -40,19 +41,18 @@ def em_list():
             return render_template('Admin_page/list_em.html')
 
         user = Employee.query.filter_by(username=validated_dict['username']).with_for_update().first()
-
-        if user:
-            flash('Username already exists')
-            return render_template('Admin_page/list_em.html')
-        
         validated_dict['password'] = generate_password_hash(validated_dict['password'], method='sha256')
-
+        print(validated_dict['password'])
+        
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
+            
             if not id_:  # ถ้าไม่มี id => เพิ่มใหม่
+                print("ไม่ผ่าน เช็คซ้ำ")
                 entry = Employee(**validated_dict)
                 db.session.add(entry)
             else:  # ถ้ามี id => แก้ไขรายการเดิม
+                print("ผ่าน เช็คซ้ำ")
                 employee = Employee.query.get(id_)
                 if employee:
                     for key, value in validated_dict.items():
