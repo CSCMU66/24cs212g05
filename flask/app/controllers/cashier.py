@@ -12,7 +12,7 @@ def cashier_index():
 def invoice():
     table_id = request.args.get('table_id')
     qrcode = request.args.get('qrcode')
-    return render_template('cashier_page/invoice.html', table_id=table_id, qrcode=qrcode)
+    return render_template('cashier_page/order_bill.html', table_id=table_id, qrcode=qrcode)
 
 
 
