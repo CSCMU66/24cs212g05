@@ -1,0 +1,175 @@
+table_manage
+    route : /table/get_all_table
+    func name : table_list()
+    input : none
+    return : all table as json format
+
+    route : /table/create', methods=('GET', 'POST')
+    func name: table_create()
+    input : none for GET and POST
+    return : all table as json format
+    note: create table in DB
+
+    route : /table/update', methods=('GET', 'POST')
+    func name: table_update()
+    input : none for GET/ table_id, status for POST
+    return : all table as json format
+    note: update status table in DB (if status='Available', create new
+          qrcode) เดี่ยวมีคนเกรียนแอบสั่ง
+
+    route : /table/delete', methods=('GET', 'POST')
+    func name: table_delete()
+    input : none for GET/ table_id for POST
+    return : all table as json format
+    note: change status to Disable table in DB
+
+order_manage
+    route : /orders
+    func name : orders()
+    input : none
+    return : order page
+
+    route : /orders/get_all_orders
+    func name: orders_list()
+    input : none for GET and POST
+    return : all order as json format
+
+    route : /orders/create', methods=('GET', 'POST')
+    func name: order_create()
+    input : none for GET/ table_id, time, ...menu_list for POST
+    return : all order as json format
+    note: create order in DB
+
+    route : /orders/admin', methods=('GET', 'POST')
+    func name: order_admin()
+    input : none for GET/ 'table_id', 'time', 'status', ...menu_list for POST
+    return : all order as json format
+    note: create order in DB in admin page
+
+    route : /orders/update', methods=('GET', 'POST')
+    func name: order_update()
+    input : none for GET/ 'table_id', 'status' for POST
+    return : all order as json format
+    note: update order status
+
+    route : /orders/delete', methods=('GET', 'POST')
+    func name: order_delete()
+    input : none for GET/ 'table_id' for POST
+    return : all order as json format
+    note: delete order 
+
+menu_manage
+    route : /menu', methods=('GET', 'POST')
+    func name: menu_list()
+    input : none for GET/ 'name', 'description', 'price', 'category', 'availability' for POST
+    return : render_template('Admin_page/list_menu.html') for GET/ all menu for POST
+    note: create menu in admin
+
+    route : /menu/menus
+    func name: order_update()
+    input : none 
+    return : all menu as json format
+
+    route : /menu/remove_menu', methods=('GET', 'POST')
+    func name: menu_remove_menu()
+    input : none for GET/ id for POST
+    return :  all menu
+    note: delete menu 
+
+    route : /menus/create', methods=('GET', 'POST')
+    func name: menu_create()
+    input : none for GET/ id for POST
+    return :  all menu
+    note: create menu 
+
+    route : /menus/get_all_menus'
+    func name: menu_list()
+    input : none 
+    return :  all menu as json format
+
+    route : /menus/update', methods=('GET', 'POST')
+    func name: menu_update()
+    input : none for GET/ id, availability for POST
+    return :  all menu
+    note: update availability menu 
+
+    route : /menus/delete', methods=('GET', 'POST')
+    func name: menu_delete()
+    input : none for GET/ id for POST
+    return :  all menu
+    note: delete menu 
+
+review_manage  
+    route : /reviews/get_all_reviews
+    func name: reviews_list()
+    input : none 
+    return :  all review
+
+    route : /reviews/create', methods=('GET', 'POST')
+    func name: review_create()
+    input : none for GET/ 'name', 'star', 'review' for POST
+    return :  all review
+    note: create review
+
+    route : /reviews/update', methods=('GET', 'POST')
+    func name: review_update()
+    input : none for GET/ 'review_id', 'name', 'star', 'review' for POST
+    return :  all review
+    note: update review
+
+    route : /reviews/delete', methods=('GET', 'POST')
+    func name: review_delete()
+    input : none for GET/ 'review_id' for POST
+    return :  all review
+    note: delete review
+
+payment_manage
+    route : /payment/get_all_payment
+    func name: payment_list()
+    input : none 
+    return :  all payment
+
+    route : /payment/create, methods=('GET', 'POST')
+    func name: payment_create()
+    input : none for GET/ 'table_id', 'payment_method', 'payment_time', 'amount' for POST
+    return :  all payment
+    note: create payment, shange table status to Available
+
+    route : /payment/update, methods=('GET', 'POST')
+    func name: payment_update()
+    input : none for GET/ 'payment_id', 'table_id', 'payment_method', 'payment_time', 'amount' for POST
+    return :  all payment
+    note: update payment
+
+    route : /payment/delete, methods=('GET', 'POST')
+    func name: payment_delete()
+    input : none for GET/ 'payment_id' for POST
+    return :  all payment
+    note: dalete payment
+
+    route : /payment/create_slip, methods=('GET', 'POST')
+    func name: slip_create()
+    input : none for GET/ 'table_id' for POST
+    return :  none for GET/ {'vat_7%': ราคา vat 7%, 
+                            'total' : ราคาไม่รวม vat, 
+                            'sum_price': { ชื่อสินค้า: {'price' : ราคารวม,
+                                                    'price_per_unit': ราคาสินค้า,
+                                                    'amount': จำนวนที่สั่ง}}} for POST
+
+employee_manage
+    route : /em, methods=('GET', 'POST')
+    func name: em_list()
+    input : none for GET/ 'payment_id' for POST
+    return :  render_template('Admin_page/list_em.html') for GET/all employee for POST
+    note: create employee
+
+    route : /em/ems
+    func name: em_db_ems()
+    input : none 
+    return : all employee 
+
+    route : /em/remove_em, methods=('GET', 'POST')
+    func name: em_remove_em()
+    input : none for GET/ 'id' for POST
+    return : all employee 
+    note: delete employee

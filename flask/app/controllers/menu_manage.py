@@ -131,7 +131,7 @@ def menu_create():
         result = request.form.to_dict()
 
         validated = True
-        valid_keys = ['is_employee', 'name', 'description', 'price', 'category', 'image_url', 'availability']
+        valid_keys = ['name', 'description', 'price', 'category', 'image_url', 'availability']
         validated_dict = dict()
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -143,9 +143,6 @@ def menu_create():
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
-                break
-            if key == 'is_employee' and result[key].lower() != "true":
-                validated = False    
                 break
             validated_dict[key] = value
 
@@ -183,7 +180,7 @@ def menu_update():
         
         validated = True
         validated_dict = dict()
-        valid_keys = ['is_employee', 'id', 'availability']
+        valid_keys = ['id', 'availability']
 
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
@@ -195,9 +192,6 @@ def menu_update():
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
-                break
-            if key == 'is_employee' and result[key].lower() != "true":
-                validated = False    
                 break
             validated_dict[key] = value
 

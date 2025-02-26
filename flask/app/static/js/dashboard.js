@@ -467,7 +467,6 @@ function fetchLatestReviews() {
              </div>
              <hr>`;
     }
-
     reviewContainer.html(htmlContent);
   });
 }

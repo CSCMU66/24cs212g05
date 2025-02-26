@@ -470,9 +470,13 @@
         if (!product) return;
 
         // Display product details in the popup
-        $("#product-image").attr("src", product.image_url);
+        $("#product-image")
+          .attr("src", product.image_url)
+          .css("width", "560px")
+          .css("height", "336px")
+          .css("object-fit", "cover");
         $("#product-name").text(product.name);
-        $("#product-description").text(`รายละเอียด: ${product.name}`);
+        $("#product-description").text(`รายละเอียด: ${product.description}`);
         $("#product-price").text(`ราคา: ${product.price} บาท`);
         $("#add-from-popup").data("product-id", productId);
 
