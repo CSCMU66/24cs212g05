@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from app import app
 from werkzeug.utils import secure_filename
 from app.models.store import Store
@@ -69,3 +69,13 @@ def setting():
     # Render the template
     store = Store.query.first()
     return render_template('Admin_page/setting.html', store=store)
+
+
+
+@app.route("/store_list")
+def store_list():
+    store = []
+    db_store = Store.query.all()
+    store = list(map(lambda x: x.to_dict(), db_store))
+    app.logger.debug("DB store (Sorted): " + str(store))
+    return jsonify(store)
