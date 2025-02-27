@@ -7,7 +7,6 @@
     <title>QR Code Slip</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- jsPDF และ html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -111,8 +110,8 @@
 <body>
     <div class="invoice-container" id="slip-content">
         <div id="header-container" style="margin-top: 1.5rem;">
-            <img src="/static/ico/logo.jpg" class="circle-image" alt="Logo">
-            <h1 id="store-name"></h1>
+            <img src="/static/logo/1.jpg" class="circle-image" alt="Logo" id="logo-image">
+            <h1 id="store-name">{{name}}</h1>
             <h2 style="justify-content: center; display: flex;" id="header-details"
                 class="is-size-4 has-text-weight-bold">ใบสั่งอาหาร</h2>
         </div>
@@ -121,8 +120,8 @@
 
         <div id="content-container">
             <div id="details">
-                <p style="justify-content: center; display: flex;" class="is-size-4 has-text-weight-bold">
-                    หมายเลขโต๊ะ: {{table_id}}
+                <p id="table_id" style="justify-content: center; display: flex;" class="is-size-4 has-text-weight-bold">
+                    หมายเลขโต๊ะ : {{table_id}}
                 </p>
                 <p class="is-size-4 has-text-weight-bold" style="justify-content: center; display: flex;">
                     Scan สั่งอาหารที่นี่
@@ -133,61 +132,96 @@
                 <span style="margin: 1.5rem 0 1.5rem 0;" id="qrcode">{{qrcode}}</span>
             </div>
         </div>
-
     </div>
 
-    <div>
-        <a href="#" id="print-qr-button" style="margin-top: 1.5rem; margin: 0 auto 0 auto;"
-            class="button is-medium is-link has-text-weight-bold is-responsive">
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="#" id="print-qr-button" class="button is-medium is-link has-text-weight-bold is-responsive mr-3">
             Print QR
+        </a>
+        <a href="/cashier" id="home-button" class="button is-medium has-text-weight-bold is-responsive"
+            style="background-color: coral; color: white;">
+            Home
         </a>
     </div>
 
     <script>
         $(document).ready(function () {
-            // อัปเดตข้อมูลเมื่อหน้าโหลด
             updateDetails();
+
+            // แปลง QR Code URL เป็นรูปภาพ
             var qrCodeValue = $("#qrcode").text();
             $("#qrcode").html(qrcodeFormatter(qrCodeValue));
 
-            // แปลงเป็น PDF และพิมพ์เมื่อคลิกปุ่ม
+            // รอให้รูปภาพโหลดก่อนพิมพ์
+            const logoImg = document.getElementById("logo-image");
+            const qrImg = $("#qrcode img")[0];
+            const images = [logoImg, qrImg];
+
+            Promise.all(
+                images.map(img => {
+                    return new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+                        if (img.complete) resolve(); // ถ้ารูปโหลดเสร็จแล้ว
+                    });
+                })
+            ).then(() => {
+                console.log("All images loaded successfully");
+            }).catch(error => {
+                console.error(error);
+                alert("ไม่สามารถโหลดรูปภาพบางรูปได้ กรุณาตรวจสอบ URL");
+            });
+
+            // พิมพ์เมื่อคลิกปุ่ม
             $("#print-qr-button").on("click", function (e) {
                 e.preventDefault();
 
                 const element = document.getElementById("slip-content");
-                html2canvas(element, { scale: 2 }).then(canvas => {
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: true // ช่วย debug
+                }).then(canvas => {
                     const imgData = canvas.toDataURL("image/png");
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({
                         orientation: "portrait",
                         unit: "mm",
-                        format: [80, 150] // ขนาด 80mm x 150mm (ปรับได้)
+                        format: [80, 150]
                     });
 
-                    const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
                     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-                    // pdf.save("qr-slip.pdf"); // ดาวน์โหลด PDF (ถ้าต้องการ)
-                    pdf.autoPrint(); // เตรียมพิมพ์
-                    pdf.output("dataurlnewwindow"); // เปิด PDF และพิมพ์
+
+                    const printWindow = window.open(pdf.output("bloburl"), "_blank");
+
+                    printWindow.onload = function () {
+                        printWindow.print();
+                        setTimeout(() => {
+                            printWindow.close();
+                        }, 3000);
+                    }
+                    printWindow.addEventListener("afterprint", () => { console.log(1111111); printWindow.close(); })
+                }).catch(error => {
+                    console.error("Error generating PDF:", error);
+                    alert("เกิดข้อผิดพลาดในการสร้างบิล กรุณาตรวจสอบคอนโซล");
                 });
             });
         });
 
         function qrcodeFormatter(value) {
-            console.log(value.replace("app/", "/"));
-            return `<img src="${value.replace("app/", "/")}" alt="QR Image" style="width: 250px; height: auto;">`;
+            const formattedUrl = value.replace("app/", "/");
+            return `<img src="${formattedUrl}" alt="QR Image" style="width: 250px; height: auto;">`;
         }
 
         function updateDetails() {
             $.getJSON("/store_list", function (data) {
-                console.log(data);
-                $("#store-name").html(data[0].name || "ร้านขายปลากดุกย่าง สาขาหลัก");
-            }).fail(function () {
-                $("#store-name").html("ร้านขายปลากดุกย่าง สาขาหลัก");
+                $("#store-name").html(data[0].name)
+
             });
+
         }
     </script>
 </body>

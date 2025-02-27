@@ -234,17 +234,15 @@
 
     function stateButton(value, row, index) {
         text = "ชำระเงิน"
-        color = "is-info"
-        id = "pay"
+        color = "is-success"
 
         if (row.status !== "Occupied") {
             text = "เริ่มใช้งาน"
             color = "is-link"
-            id = "occupy"
 
         }
         return `
-            <button id="${id}" class="button width-tag is-medium is-respondsive ${color}">
+            <button id="occupy" class="button width-tag is-medium is-respondsive ${color}">
                 <p class="has-text-weight-bold">${text}</p>
             </button>
         `;
@@ -426,9 +424,9 @@
             });
 
 
-        } else if (rowData.status === "Reserved") {
+        } else if (rowData.status === "Occupied") {
             Swal.fire({
-                title: `ยกเลิกการจองโต๊ะที่ ${rowData.table_id}`,
+                title: `ปริ้นสลิปของโต๊ะที่ ${rowData.table_id}`,
                 text: "คุณแน่ใจหรือไม่?",
                 icon: "warning",
                 showCancelButton: true,
@@ -436,8 +434,13 @@
                 cancelButtonText: "ยกเลิก"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    var data_ = { table_id: rowData.table_id, status: "Available" }
-                    $.post('/table/update', data_, function (event) { loadTable(); })
+                    let tableId = encodeURIComponent(rowData.table_id);
+                    let qrCode = encodeURIComponent(rowData.qrcode);
+                    let url = `/cashier/invoice?table_id=${encodeURIComponent(rowData.table_id)}&qrcode=${encodeURIComponent(rowData.qrcode)}`;
+
+                    // Redirect to invoice.html
+                    window.location.href = url;
+
                 } else {
                     console.log("ผู้ใช้กด Cancel");
                 }
@@ -463,7 +466,7 @@
                 // Construct the URL with table_id and qrcode as query parameters
                 let tableId = encodeURIComponent(rowData.table_id);
                 let qrCode = encodeURIComponent(rowData.qrcode);
-                let url = `/cashier/invoice?table_id=${encodeURIComponent(rowData.table_id)}&qrcode=${encodeURIComponent(rowData.qrcode)}`;
+                let url = `/cashier/qrcode?table_id=${encodeURIComponent(rowData.table_id)}&qrcode=${encodeURIComponent(rowData.qrcode)}`;
 
                 // Redirect to invoice.html
                 window.location.href = url;
@@ -471,6 +474,8 @@
                 console.log("ผู้ใช้กด Cancel");
             }
         });
+
+
     });
 
 </script>
