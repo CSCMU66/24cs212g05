@@ -23,6 +23,7 @@ from app.models.table import Tables
 from app.models.order import Order
 from app.models.review import Review
 from app.models.store import Store
+from app.models.noti import Noti
 # from app.models.employee import AuthUser
 
 '''
@@ -236,8 +237,13 @@ def seed_db():
     db.session.commit()
     #?-------------------------------------------------------------------------
 
-    db.session.add(Store(name = "ปลาดุกทอด", vat = 7.0, service_charge = 0 , Max_Orders_per_Round = 5, Max_Food_Quantity_per_Order = 100))
+    db.session.add(Store(name = "ปลาดุกทอด", vat = 7.0, service_charge = 0 ,  Max_Menu_per_Round = 5, Max_Food_Quantity_per_Order = 100, Tax = "1650614130100"))
     db.session.commit()
+
+    db.session.add(Noti(type='other', message='ยินดีต้อนรับ', link='http://localhost:56733/admin'))
+    db.session.commit()
+
+
 
 @cli.command("secret_key")
 def generate_secret_key():
