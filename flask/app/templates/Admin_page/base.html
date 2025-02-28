@@ -19,6 +19,7 @@
     {% block extra_css %}{% endblock %}
   </head>
 
+  testtttttttttttttttttttttttttttttttttttttttttttttttttttt
   <body>
     <nav
       class="navbar is-dark"
@@ -269,28 +270,28 @@
             });
     }
 
-      function markAsRead(notificationId) {
-        fetch(`/api/notifications/${notificationId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ is_read: true }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Notification marked as read:", data);
-            fetchNotifications();
-          })
-          .catch((error) => {
-            console.error("Error marking notification as read:", error);
-          });
-      }
+      // function markAsRead(notificationId) {
+      //   fetch(`/api/notifications/${notificationId}`, {
+      //     method: "PUT",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({ is_read: true }),
+      //   })
+      //     .then((response) => {
+      //       if (!response.ok) {
+      //         throw new Error("Network response was not ok");
+      //       }
+      //       return response.json();
+      //     })
+      //     .then((data) => {
+      //       console.log("Notification marked as read:", data);
+      //       fetchNotifications();
+      //     })
+      //     .catch((error) => {
+      //       console.error("Error marking notification as read:", error);
+      //     });
+      // }
 
       function deleteNotification(notificationId) {
         console.log("Deleting notification with ID:", notificationId);

@@ -41,7 +41,7 @@ def em_list():
 
         user = Employee.query.filter_by(username=validated_dict['username']).with_for_update().first()
         validated_dict['password'] = generate_password_hash(validated_dict['password'], method='sha256')
-        print(validated_dict['password'])
+        # print(validated_dict['password'])
         
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
