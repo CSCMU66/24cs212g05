@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         body {
@@ -59,15 +60,12 @@
 
             .invoice-container {
                 width: 80mm;
-                /* ความกว้างสำหรับเครื่องพิมพ์ใบเสร็จ 80 มม. */
                 max-width: 80mm;
                 margin: 0;
                 padding: 5mm;
-                /* ลด padding ให้เหมาะกับกระดาษเล็ก */
                 border: none;
                 box-shadow: none;
                 text-align: center;
-
             }
 
             .circle-image {
@@ -83,9 +81,8 @@
 
             #header-details {
                 font-size: 12pt;
-                margin-bottom: 5mm;
+                margin-top: 5mm;
                 text-align: center;
-                /* จัดกึ่งกลางเมื่อพิมพ์ */
             }
 
             #details p {
@@ -95,7 +92,6 @@
 
             #qrcode img {
                 width: 50mm;
-                /* ขนาด QR Code = 5 ซม. เหมาะกับหน้ากว้าง 80 มม. */
                 height: auto;
                 margin: 5mm 0;
             }
@@ -106,54 +102,260 @@
 
             .button {
                 display: none;
-                /* ซ่อนปุ่ม Print QR เมื่อพิมพ์ */
             }
+        }
+
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            /* border: 1px solid #ddd; */
+            border-radius: 5px;
+            /* background-color: #f9f9f9; */
+            /* transition: background-color 0.3s; */
+        }
+
+        /* .item:hover {
+            background-color: #f0f0f0;
+        } */
+
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            flex-basis: 30%;
+        }
+
+        .item-amount,
+        .item-price,
+        .item-price-per-unit {
+            color: #555;
+            flex-basis: 20%;
+            text-align: right;
         }
     </style>
 </head>
 
 <body>
-    <div class="invoice-container">
+    <div class="invoice-container" id="slip-content">
         <div id="header-container" style="margin-top: 1.5rem;">
-            <img src="/static/ico/logo.jpg" class="circle-image" alt="Logo">
-            <h1 id="store-name">ร้านขายปลากดุกย่าง สาขาหลัก</h1>
+            <img src="/static/logo/1.jpg" class="circle-image" alt="Logo" id="logo-image">
+            <h1 id="store-name">{{name}}</h1>
             <h2 style="justify-content: center; display: flex;" id="header-details"
-                class="is-size-4 has-text-weight-bold">ใบสั่งอาหาร</h2>
+                class="is-size-4 has-text-weight-bold">ใบเสร็จ / รับเงิน</h2>
         </div>
+        <h1 class="mt-5"><strong>Tax : </strong>1650614130100</h1>
+        <h1><strong>พนักงาน : </strong>{{ current_user.firstname }} {{ current_user.lastname }}</h1>
+        <h1><strong>เวลา :</strong><span id="time"></span></h1>
 
         <hr>
 
         <div id="content-container">
             <div id="details">
-                <p style="justify-content: center; display: flex;" class="is-size-4 has-text-weight-bold">
-                    หมายเลขโต๊ะ: {{table_id}}
-                </p>
-                <p class="is-size-4 has-text-weight-bold" style="justify-content: center; display: flex;">
-                    Scan สั่งอาหารที่นี่
-                </p>
-            </div>
 
-            <div id="qr-image">
-                <span style="margin: 1.5rem 0 1.5rem 0;" id="qrcode">{{qrcode}}</span>
             </div>
         </div>
 
-        <a href="cashier/download" style="margin-top: 1.5rem;"
-            class="button is-fullwidth is-link has-text-weight-bold is-responsive">
+    </div>
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="#" id="print-qr-button" class="button is-medium is-link has-text-weight-bold is-responsive mr-3">
             Print QR
+        </a>
+        <a href="/cashier" id="home-button" class="button is-medium has-text-weight-bold is-responsive"
+            style="background-color: coral; color: white;">
+            Home
         </a>
     </div>
 
     <script>
         $(document).ready(function () {
-            var qrCodeValue = $("#qrcode").text();
-            $("#qrcode").html(qrcodeFormatter(qrCodeValue));
+            let table_id_ = '{{table_id}}'
+            updateDetails(table_id_);
+            const localDate = new Date(); // Current local date and time
+            const formattedUtcDate = new Intl.DateTimeFormat('th-TH', {
+                weekday: 'long',   // e.g., "Monday"
+                year: 'numeric',   // e.g., "2025"
+                month: 'short',     // e.g., "February"
+                day: 'numeric',    // e.g., "27"
+                hour: 'numeric',   // e.g., "5 PM"
+                minute: 'numeric', // e.g., "30"
+                // second: 'numeric', // e.g., "00"
+                // hour12: true       // Use 12-hour format
+            }).format(localDate);
+
+            $('#time').text(`${formattedUtcDate} น.`)
+
+            //     // แปลง QR Code URL เป็นรูปภาพ
+            //     var qrCodeValue = $("#qrcode").text();
+            //     $("#qrcode").html(qrcodeFormatter(qrCodeValue));
+
+            //     // รอให้รูปภาพโหลดก่อนพิมพ์
+            //     const logoImg = document.getElementById("logo-image");
+            //     const qrImg = $("#qrcode img")[0];
+            //     const images = [logoImg, qrImg];
+
+            //     Promise.all(
+            //         images.map(img => {
+            //             return new Promise((resolve, reject) => {
+            //                 img.onload = resolve;
+            //                 img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+            //                 if (img.complete) resolve(); // ถ้ารูปโหลดเสร็จแล้ว
+            //             });
+            //         })
+            //     ).then(() => {
+            //         console.log("All images loaded successfully");
+            //     }).catch(error => {
+            //         console.error(error);
+            //         // alert("ไม่สามารถโหลดรูปภาพบางรูปได้ กรุณาตรวจสอบ URL");
+            //     });
+
+            //     // พิมพ์เมื่อคลิกปุ่ม
+            //     $("#print-qr-button").on("click", function (e) {
+            //         e.preventDefault();
+
+            //         const element = document.getElementById("slip-content");
+            //         html2canvas(element, {
+            //             scale: 2,
+            //             useCORS: true,
+            //             logging: true // ช่วย debug
+            //         }).then(canvas => {
+            //             const imgData = canvas.toDataURL("image/png");
+            //             const { jsPDF } = window.jspdf;
+            //             const pdf = new jsPDF({
+            //                 orientation: "portrait",
+            //                 unit: "mm",
+            //                 format: [80, 150]
+            //             });
+
+            //             const pdfWidth = pdf.internal.pageSize.getWidth();
+            //             const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            //             pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+            //             const printWindow = window.open(pdf.output("bloburl"), "_blank");
+
+            //             printWindow.onload = function () {
+            //                 printWindow.print();
+            //                 setTimeout(() => {
+            //                     printWindow.close();
+            //                 }, 3000);
+            //             }
+            //             printWindow.addEventListener("afterprint", () => { console.log(1111111); printWindow.close(); })
+            //         }).catch(error => {
+            //             console.error("Error generating PDF:", error);
+            //             alert("เกิดข้อผิดพลาดในการสร้างบิล กรุณาตรวจสอบคอนโซล");
+            //         });
+            //     });
+            // });
         });
 
-        function qrcodeFormatter(value) {
-            console.log(value.replace("app/", "/"));
-            return `<img src="${value.replace("app/", "/")}" alt="QR Image" style="width: 250px; height: auto;">`;
+        // function qrcodeFormatter(value) {
+        //     const formattedUrl = value.replace("app/", "/");
+        //     return `<img src="${formattedUrl}" alt="QR Image" style="width: 250px; height: auto;">`;
+        // }
+
+
+        function updateDetails(table_id_) {
+            console.log(2222222222)
+            $.getJSON("/store_list", function (data) {
+                $("#store-name").html(data[0].name)
+
+            });
+
+            $.post('/payment/create_slip', { table_id: table_id_ }, function (table_data) {
+
+                const sumprice = table_data['sum_price']
+                const total = table_data['total']
+                const vat = table_data['vat_7%']
+                create_list(sumprice, total, vat)
+
+            })
+
         }
+        const create_list = (data, total, vat) => {
+            let totalamout = 0
+            if (typeof data !== 'object' || data === null) {
+                console.error('Expected an object with item data');
+                return;
+            }
+
+            let listItems = '<ul class="item-list">';
+
+
+            listItems += `<li class="item"> 
+                <span class="item-name">ชื่อเมนู</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount">จำนวน</span>
+                <span class="item-price-per-unit">ราคาต่อชิ้น</span>
+                <span class="item-price">ราคารวม</span>
+            </li><hr/>`
+            // Loop through the object entries
+            Object.entries(data).forEach(([key, item], index) => {
+                console.log(item);
+                let amount = item.amount || 'N/A';
+                let price = parseFloat(item.price).toFixed(2) || 'N/A';
+                let pricePerUnit = parseFloat(item.price_per_unit).toFixed(2) || 'N/A';
+                totalamout += amount;
+                listItems += `
+            <li class="item">
+                
+                <span class="item-name">${key || 'Unnamed'}</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount">${amount}</span>
+                <span class="item-price-per-unit">${pricePerUnit}</span>
+                <span class="item-price">${price}</span>
+            </li>
+        `;
+            });
+
+            listItems += `
+                <hr/>
+            <li class="item">
+                <span class="item-name">ราคาไม่รวม vat</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount"></span>
+                <span class="item-price-per-unit"></span>
+                <span class="item-price">${parseFloat(total).toFixed(2)}</span>
+            </li>
+        `;
+
+            listItems += `
+                
+            <li class="item">
+                <span class="item-name">vat 7%</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount"></span>
+                <span class="item-price-per-unit"></span>
+                <span class="item-price">${(vat).toFixed(2)}</span>
+            </li>
+        `;
+
+            listItems += `
+                
+            <li class="item">
+                <span class="item-name">ราคารวม vat 7%</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount"></span>
+                <span class="item-price-per-unit"></span>
+                <span class="item-price">${vat + total}</span>
+            </li>
+        `;
+            listItems += `
+                
+            <li class="item">
+                <span class="item-name">ราคารวม vat 7% (ปัดเศษ)</span>  <!-- Assuming 'name' is a field -->
+                <span class="item-amount"></span>
+                <span class="item-price-per-unit"></span>
+                <span class="item-price">${Math.floor(vat + total)}</span>
+            </li>
+        `;
+            listItems += '</ul>';
+            $('#details').html(listItems);
+        };
+
+
     </script>
 </body>
 
