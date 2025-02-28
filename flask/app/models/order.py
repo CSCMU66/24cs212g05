@@ -14,7 +14,7 @@ class Order(db.Model, SerializerMixin):
     status = db.Column(db.String(20), nullable=False, default="Preparing")  # สถานะคำสั่งซื้อ
     
     '''
-    สถานะคำสั่งซื้อ (Preparing, Ready, Served, Paid)
+    สถานะคำสั่งซื้อ (Preparing, Ready, Served, Paid, Disable)
     '''
     menu_list = db.Column(db.JSON, nullable=False)
     '''Menu_list = {menu_id : amount}'''

@@ -3,27 +3,29 @@ from flask import (jsonify, render_template,
 
 from app import app
 from app import db
-from app.models.review import Review
+from app.models.reserve import Reserve
 from app.models.noti import Noti
-from flask_login import login_required, current_user
+from flask_login import login_required
 from app.controllers.role_controller import roles_required 
 
 
-@app.route('/reviews/get_all_reviews')
-def reviews_list():
-    db_allreview = Review.query.all()
-    reviews = list(map(lambda x: x.to_dict(), db_allreview))
-    reviews.sort(key=(lambda x: int(x['review_id'])))
-    return jsonify({"reviews": reviews})
+@app.route('/reserve/get_all_reserve')
+def reserve_list():
+    db_allreview = db.session.query(Reserve).filter(Reserve.status == 'Enable').all()
+    reserve = list(map(lambda x: x.to_dict(), db_allreview))
+    reserve.sort(key=(lambda x: int(x['reserve_id'])))
+    return jsonify(reserve)
 
-@app.route('/reviews/create', methods=('GET', 'POST'))
-def review_create():
+@app.route('/reserve/create', methods=('GET', 'POST'))
+@login_required
+@roles_required('Admin', 'Cashier')
+def reserve_create():
     
     if request.method == 'POST':
-        app.logger.debug("review - CREATE")
+        app.logger.debug("reserve - CREATE")
         result = request.form.to_dict()
         app.logger.debug(result)
-        valid_keys = ['name', 'star', 'review']
+        valid_keys = ['table_id', 'reserve_time', 'customer_name', 'customer_phone_number', 'cashier_id']
         validated = True
         validated_dict = dict()
         for key in result:
@@ -41,41 +43,38 @@ def review_create():
         app.logger.debug(validated_dict)
         if validated:
             try:
-                temp = Review(
-                    name=validated_dict['name'],
-                    star=validated_dict['star'],
-                    review=validated_dict['review']
+                temp = Reserve(
+                    **validated_dict
                 )
                 db.session.add(temp)
                 db.session.commit()
                 
                 newNoti = Noti(                    
-                    type="Review",
-                    message="มีการแก้ไขออเดอร์",
+                    type="Reserve",
+                    message="จองโต๊ะ",
                     link='http://localhost:56733/orders'
                 )
                 db.session.add(newNoti)
                 db.session.commit()
 
-                print('ผ่านเหี้ยนี่')
-
             except Exception as ex:
-                app.logger.error(f"Error create new review: {ex}")
+                app.logger.error(f"Error create new reserve: {ex}")
                 raise
             
-    return reviews_list()
+    return reserve_list()
 
-@app.route('/reviews/update', methods=('GET', 'POST'))
+@app.route('/reserve/update', methods=('GET', 'POST'))
 @login_required
-@roles_required('Admin')
-def review_update():
+@roles_required('Admin', 'Cashier')
+def reserve_update():
     
     if request.method == 'POST':
         
-        app.logger.debug("review - UPDATE")
+        app.logger.debug("reserve - UPDATE")
         result = request.form.to_dict()
         app.logger.debug(result)
-        valid_keys = ['review_id', 'name', 'star', 'review']
+        valid_keys = ['table_id', 'reserve_time', 'customer_name', 'customer_phone_number', 'cashier_id']
+        reserve_id = result.get('reserve_id', '')
         validated = True
         validated_dict = dict() 
         for key in result:
@@ -93,10 +92,8 @@ def review_update():
         app.logger.debug(validated_dict)
         if validated:
             try:
-                review = Review.query.get(validated_dict['review_id'])
-                review.update(name=validated_dict['name'],
-                              review=validated_dict['review'],
-                              star=validated_dict['star'])
+                reserve = Reserve.query.get(reserve_id)
+                reserve.update(**validated_dict)
                 
                 db.session.commit()
                 
@@ -104,19 +101,19 @@ def review_update():
                 app.logger.error(f"Error create new review: {ex}")
                 raise
             
-    return reviews_list()
+    return reserve_list()
 
-@app.route('/reviews/delete', methods=('GET', 'POST'))
+@app.route('/reserve/delete', methods=('GET', 'POST'))
 @login_required
 @roles_required('Admin')
-def review_delete():
+def reserve_delete():
     
     if request.method == 'POST':
         
-        app.logger.debug("review - DELETE")
+        app.logger.debug("reserve - DELETE")
         result = request.form.to_dict()
         app.logger.debug(result)
-        valid_keys = ['review_id']
+        valid_keys = ['reserve_id']
         validated = True
         validated_dict = dict() 
         for key in result:
@@ -134,26 +131,13 @@ def review_delete():
         app.logger.debug(validated_dict)
         if validated:
             try:
-                review = Review.query.get(validated_dict['review_id'])
-                review.change_status('Disable')
+                reserve = Reserve.query.get(validated_dict['reserve_id'])
+                reserve.change_status('Disable')
                 
                 db.session.commit()
                 
             except Exception as ex:
-                app.logger.error(f"Error create new review: {ex}")
+                app.logger.error(f"Error delete new reserve: {ex}")
                 raise
             
-    return reviews_list()
-
-@app.route('/list_review.html')
-def review_list():
-    return render_template('Admin_page/list_review.html')
-
-@app.route('/reviews/get_all_reviews_array')
-def reviews_list_array():
-    db_allreview = db.session.query(Review).filter(Review.status == 'Enable').all()
-    reviews = sorted(
-        (x.to_dict() for x in db_allreview),
-        key=lambda x: int(x['review_id'])
-    )
-    return jsonify(reviews)  # ส่งเป็น array ตรงๆ
+    return reserve_list()

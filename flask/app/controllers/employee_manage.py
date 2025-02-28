@@ -100,7 +100,7 @@ def em_remove_em():
         id_ = result.get('id', '')
         try:
             em = Employee.query.get(id_)
-            db.session.delete(em)
+            em.change_status('Disable')
             db.session.commit()
         except Exception as ex:
             app.logger.error(f"Error removing em with id {id_}: {ex}")

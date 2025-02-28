@@ -10,6 +10,11 @@ class Payment(db.Model, SerializerMixin):
     payment_method = db.Column(db.String(50), nullable=False)  # วิธีการชำระเงิน (เงินสด, บัตรเครดิต, QR Payment)
     payment_time = db.Column(db.DateTime, nullable=False)  # เวลาที่ชำระ
     amount = db.Column(db.Float, nullable=False)  # ยอดชำระ
+    status = db.Column(db.String, default="Enable")
+
+    '''
+    status : Enable, Disable
+    '''
 
     def __init__(self, table_id, payment_method, payment_time, amount):
         self.table_id = table_id
@@ -22,3 +27,6 @@ class Payment(db.Model, SerializerMixin):
         self.payment_time = payment_time
         self.amount = amount
         self.table_id = table_id
+
+    def change_status(self, status):
+        self.status = status

@@ -10,3 +10,4 @@ from app.controllers import report
 from app.controllers import login
 from app.controllers import tranding
 from app.controllers import notification
+from app.controllers import reserve_manage
