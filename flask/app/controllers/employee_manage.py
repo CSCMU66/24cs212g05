@@ -102,7 +102,7 @@ def em_remove_em():
         id_ = result.get('id', '')
         try:
             em = Employee.query.get(id_)
-            db.session.delete(em)
+            em.change_status('Disable')
             db.session.commit()
 
             newNoti = Noti(                    

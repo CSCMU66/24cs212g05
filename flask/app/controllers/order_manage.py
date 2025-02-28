@@ -225,7 +225,7 @@ def order_delete():
         if validated:
             try:
                 orders = Order.query.get(validated_dict['order_id'])
-                db.session.delete(orders)
+                orders.update_status('Disable')
                 db.session.commit()
             except Exception as ex:
                 app.logger.error(f"Error delete orders: {ex}")

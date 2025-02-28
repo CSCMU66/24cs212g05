@@ -8,13 +8,24 @@ class Review(db.Model, SerializerMixin):
     name = db.Column(db.String(100))
     review = db.Column(db.String(250))
     star = db.Column(db.Integer)
+    status = db.Column(db.String, default="Enable")
+
+    '''
+    status : Enable , Disable
+    '''
 
     def __init__(self, name, review, star):
         self.name = name
         self.review = review
         self.star = star
+        self.status = 'Enable'
+
 
     def update(self, name, review, star):
         self.name = name
         self.review = review
         self.star = star
+
+    def change_status(self, status):
+        self.status = status
+

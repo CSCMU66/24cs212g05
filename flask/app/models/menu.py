@@ -13,6 +13,11 @@ class Menu(db.Model, SerializerMixin):
     image_url = db.Column(db.String(255), nullable=True)
     availability = db.Column(db.Boolean, nullable=False)
     ordered = db.Column(db.Integer)
+    status = db.Column(db.String, default="Enable")
+
+    '''
+    status : Enable, Disable
+    '''
 
     def __init__(self, name, description, price, category, image_url=None, availability=True):
         self.name = name
@@ -38,3 +43,6 @@ class Menu(db.Model, SerializerMixin):
 
     def update_ordered(self, plus):
         self.ordered += plus
+
+    def change_status(self, status):
+        self.status = status

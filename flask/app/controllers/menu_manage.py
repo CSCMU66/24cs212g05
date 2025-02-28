@@ -265,7 +265,7 @@ def menu_delete():
         if validated:
             try:
                 menus = Menu.query.get(validated_dict['id'])
-                db.session.delete(menus)
+                menus.shange_status('Disable')
                 db.session.commit()
             except Exception as ex:
                 app.logger.error(f"Error delete menu: {ex}")
