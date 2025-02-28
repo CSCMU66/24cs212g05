@@ -196,7 +196,7 @@
                   class="input"
                   id="Tax_id"
                   name="Tax_id"
-                  minlength="0"
+                  minlength="13"
                   maxlength="13"
                   step="0.01"
                   value="{{ store.Tax if store else '' }}"
@@ -232,9 +232,9 @@
                 <input
                   type="number"
                   class="input"
-                  name="max_orders"
+                  name="max_menu"
                   min="1"
-                  value="{{ store.Max_Orders_per_Round if store else '' }}"
+                  value="{{ store.Max_Menu_per_Round if store else '' }}"
                 />
               </div>
               <div class="field">
@@ -277,24 +277,43 @@
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
       form.addEventListener('submit', function (e) {
-        e.preventDefault(); // ป้องกันการส่งฟอร์มทันที
+        e.preventDefault(); // ป้องกันการส่งฟอร์มแบบปกติ
   
-        // ส่งฟอร์มด้วย jQuery AJAX
-        $.ajax({
-          url: form.action,
-          method: form.method,
-          data: new FormData(form),
-          processData: false,
-          contentType: false,
-          success: function (data) {
+        const formData = new FormData(form); // สร้าง FormData จากฟอร์ม
+        const actionUrl = form.action; // URL ที่ฟอร์มจะส่งข้อมูลไป
+        const method = form.method; // HTTP method (POST)
+  
+        // ส่งข้อมูลด้วย fetch
+        fetch(actionUrl, {
+          method: method,
+          body: formData,
+        })
+          .then(response => response.json()) // แปลง response เป็น JSON
+          .then(data => {
+            if (data.success) {
               Swal.fire({
                 icon: 'success',
                 title: 'สำเร็จ!',
                 text: data.message || 'เปลี่ยนแปลงข้อมูลสำเร็จ',
-                confirmButtonText: 'ตกลง'
+                confirmButtonText: 'ตกลง',
               });
-          }
-        });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด!',
+                text: data.message || 'ไม่สามารถเปลี่ยนแปลงข้อมูลได้',
+                confirmButtonText: 'ตกลง',
+              });
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด!',
+              text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+              confirmButtonText: 'ตกลง',
+            });
+          });
       });
     });
   });

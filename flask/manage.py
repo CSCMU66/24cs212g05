@@ -236,7 +236,7 @@ def seed_db():
     db.session.commit()
     #?-------------------------------------------------------------------------
 
-    db.session.add(Store(name = "ปลาดุกทอด", vat = 7.0, service_charge = 0 , Max_Orders_per_Round = 5, Max_Food_Quantity_per_Order = 100, Tax = "1650614130100"))
+    db.session.add(Store(name = "ปลาดุกทอด", vat = 7.0, service_charge = 0 ,  Max_Menu_per_Round = 5, Max_Food_Quantity_per_Order = 100, Tax = "1650614130100"))
     db.session.commit()
 
 @cli.command("secret_key")

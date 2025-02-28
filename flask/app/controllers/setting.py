@@ -21,64 +21,80 @@ os.makedirs(LOGO_FOLDER, exist_ok=True)
 @roles_required('Admin')
 def setting():
     if request.method == 'POST':
-        # Handle file uploads and form data here
-        if 'cooking_sound' in request.form:
-            cooking_sound = request.files['cooking_sound']
-            if cooking_sound.filename != '':
-                filename = "cooking_room.mp3"
-                cooking_sound.save(os.path.join(SOUNDS_FOLDER, filename))
+        response_data = {'success': False, 'message': ''}
 
+        try:
+            # Handle file uploads
+            if 'cooking_sound' in request.files:
+                cooking_sound = request.files['cooking_sound']
+                if cooking_sound.filename != '':
+                    filename = "cooking_room.mp3"
+                    cooking_sound.save(os.path.join(SOUNDS_FOLDER, filename))
+                    response_data['message'] = 'อัปโหลดเสียงห้องครัวสำเร็จ'
+                    response_data['success'] = True
 
-        if 'waiter_sound' in request.files:
-            waiter_sound = request.files['waiter_sound']
-            if waiter_sound.filename != '':
-                filename = "waiter.mp3"
-                waiter_sound.save(os.path.join(SOUNDS_FOLDER, filename))
+            if 'waiter_sound' in request.files:
+                waiter_sound = request.files['waiter_sound']
+                if waiter_sound.filename != '':
+                    filename = "waiter.mp3"
+                    waiter_sound.save(os.path.join(SOUNDS_FOLDER, filename))
+                    response_data['message'] = 'อัปโหลดเสียงพนักงานเสิร์ฟสำเร็จ'
+                    response_data['success'] = True
 
+            if 'logo_file' in request.files:
+                logo_file = request.files['logo_file']
+                if logo_file.filename != '':
+                    filename = "logo.jpg"
+                    logo_file.save(os.path.join(LOGO_FOLDER, filename))
+                    response_data['message'] = 'อัปโหลดโลโก้สำเร็จ'
+                    response_data['success'] = True
 
-        if 'logo_file' in request.files:
-            logo_file = request.files['logo_file']
-            if logo_file.filename != '':
-                filename = "logo.jpg"
-                logo_file.save(os.path.join(LOGO_FOLDER, filename))
-
-
-        # Handle vat and service charge updates
-        if 'vat_rate' in request.form:
-            vat_rate = float(request.form['vat_rate'])
-            store = Store.query.first() 
-            if store:
-                store.update_vat(vat_rate)
-
-        if 'service_charge' in request.form:
-            service_charge = float(request.form['service_charge'])
+            # Handle form data
             store = Store.query.first()
             if store:
-                store.update_service_charge(service_charge)
+                if 'name' in request.form:
+                    name = request.form['name']
+                    store.update_name(name)
+                    response_data['message'] = 'อัปเดตชื่อร้านสำเร็จ'
+                    response_data['success'] = True
 
-        # Handle order settings updates
-        if 'max_orders' in request.form:
-            max_orders = int(request.form['max_orders'])
-            store = Store.query.first()
-            if store:
-                store.update_max_orders(max_orders)
+                if 'vat_rate' in request.form:
+                    vat_rate = float(request.form['vat_rate'])
+                    store.update_vat(vat_rate)
+                    response_data['message'] = 'อัปเดต VAT สำเร็จ'
+                    response_data['success'] = True
 
-        if 'max_food_quantity' in request.form:
-            max_food_quantity = int(request.form['max_food_quantity'])
-            store = Store.query.first()
-            if store:
-                store.update_max_food(max_food_quantity)
+                if 'service_charge' in request.form:
+                    service_charge = float(request.form['service_charge'])
+                    store.update_service_charge(service_charge)
+                    response_data['message'] = 'อัปเดตค่าบริการสำเร็จ'
+                    response_data['success'] = True
 
-        if 'Tax_id' in request.form:
-            Tax_id = str(request.form['Tax_id'])
-            store = Store.query.first()
-            if store:
-                store.update_tax(Tax_id)
+                if 'max_menu' in request.form:
+                    max_orders = int(request.form['max_menu'])
+                    store.update_max_menu(max_orders)
+                    response_data['message'] = 'อัปเดตจำนวนเมนูต่อออเดอร์สำเร็จ'
+                    response_data['success'] = True
 
+                if 'max_food_quantity' in request.form:
+                    max_food_quantity = int(request.form['max_food_quantity'])
+                    store.update_max_food(max_food_quantity)
+                    response_data['message'] = 'อัปเดตจำนวนอาหารต่อเมนูสำเร็จ'
+                    response_data['success'] = True
 
-        return redirect(url_for('setting'))
+                if 'Tax_id' in request.form:
+                    Tax_id = str(request.form['Tax_id'])
+                    store.update_tax(Tax_id)
+                    response_data['message'] = 'อัปเดตรหัสผู้เสียภาษีสำเร็จ'
+                    response_data['success'] = True
 
-    # Render the template
+        except Exception as e:
+            response_data['message'] = f'เกิดข้อผิดพลาด: {str(e)}'
+            response_data['success'] = False
+
+        return jsonify(response_data)  # ส่งกลับข้อมูลเป็น JSON
+
+    # สำหรับ GET request
     store = Store.query.first()
     return render_template('Admin_page/setting.html', store=store)
 
