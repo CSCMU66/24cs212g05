@@ -69,6 +69,13 @@ def setting():
             if store:
                 store.update_max_food(max_food_quantity)
 
+        if 'Tax_id' in request.form:
+            Tax_id = str(request.form['Tax_id'])
+            store = Store.query.first()
+            if store:
+                store.update_tax(Tax_id)
+
+
         return redirect(url_for('setting'))
 
     # Render the template
