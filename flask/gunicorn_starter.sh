@@ -12,7 +12,8 @@ if [ "$APP_ENV" = "development" ]; then
     echo ""
     echo "Creating the database tables..."
     python3 manage.py create_db
-    python3 manage.py seed_db
+    python3 manage.py seed_db 
+    python3 manage.py secret_key
     echo "Tables created"
     if [ "$FLASK_DEBUG" = "1" ]; then
         echo "Running on Flask Development Server"

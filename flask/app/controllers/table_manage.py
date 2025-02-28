@@ -85,6 +85,7 @@ def generate_jwt(table_number, count):
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token
+
 @app.route('/table/admin', methods=['POST'])
 @login_required
 @roles_required('Admin')
@@ -131,13 +132,25 @@ def table_admin():
                     db.session.add(newNoti)
 
                 else:
+                    table = Tables.query.get(validated_dict['table_id'])
                     table.update_status(validated_dict['status'])
                     newNoti = Noti(                    
-                        type="Order",
-                        message="มีการแก้ไขโต๊ะ",
-                        link='http://localhost:56733/menu'
+                            type="Order",
+                            message="มีการแก้ไขโต๊ะ",
+                            link='http://localhost:56733/menu'
                     )
                     db.session.add(newNoti)
+                    db.session.commit()
+                    if validated_dict['status'] == 'Available':
+                        table = Tables.query.get(validated_dict['table_id'])
+                        qrcode = gennerate_qrcode(table.table_id, table.count)
+                        newNoti = Noti(                    
+                            type="Order",
+                            message="มีการแก้ไขโต๊ะ",
+                            link='http://localhost:56733/menu'
+                        )
+                        db.session.add(newNoti)
+                        table.change_qrcode(qrcode)
                 db.session.commit()
                 
             except Exception as ex:
@@ -159,6 +172,8 @@ def table_update():
         validated_dict = dict()
         valid_keys = ['table_id', 'status']
 
+        
+
         for key in result:
             app.logger.debug(f"{key}: {result[key]}")
             # screen of unrelated inputs
@@ -171,6 +186,10 @@ def table_update():
                 validated = False
                 break
             validated_dict[key] = value
+
+        if validated_dict['status'] not in ["Available","Occupied", "Reserved", "Disable"]:
+            # app.logger.debug(validated_dict['status'])
+            validated = False
 
         # app.logger.debug(validated_dict)
         
@@ -185,7 +204,7 @@ def table_update():
                         link='http://localhost:56733/menu'
                 )
                 db.session.add(newNoti)
-                db.session.commit()
+                
                 if validated_dict['status'] == 'Available':
                     table = Tables.query.get(validated_dict['table_id'])
                     qrcode = gennerate_qrcode(table.table_id, table.count)
@@ -196,6 +215,7 @@ def table_update():
                     )
                     db.session.add(newNoti)
                     table.change_qrcode(qrcode)
+                db.session.commit()
             except Exception as ex:
                 app.logger.error(f"Error update status: {ex}")
                 raise

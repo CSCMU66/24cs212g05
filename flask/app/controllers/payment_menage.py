@@ -7,10 +7,16 @@ from app import db
 from sqlalchemy.sql import text
 from flask_login import login_required, current_user
 from app.controllers.role_controller import roles_required 
+from app.models.store import Store
 from app.models.table import Tables
 from app.models.order import Order
 from app.models.payment import Payment
 from app.models.menu import Menu
+from manage import SECRET_KEY
+import jwt
+import qrcode
+import datetime
+
 
 @app.route('/payment/get_all_payment')
 def payment_list():
@@ -49,8 +55,11 @@ def payment_create():
             try:
                 temp = Payment(**validated_dict)
                 db.session.add(temp)
+                change_order_status(table_id)
                 table = Tables.query.get(table_id)
                 table.update_status('Available')
+                qrcode = gennerate_qrcode(table.table_id, table.count)
+                table.change_qrcode(qrcode)
                 
                 db.session.commit()
                 
@@ -59,6 +68,29 @@ def payment_create():
                 raise
             
     return payment_list()
+
+def change_order_status(table_id):
+    db_order = db.session.query(Order).filter(Order.table_id == table_id and Order.status != 'Paid').all() 
+    orders = list(map(lambda x: x.to_dict(), db_order))
+    for order in db_order:
+        order.update_status('Paid')
+
+def gennerate_qrcode(id, count):
+    token = generate_jwt(id, count)
+    img = qrcode.make(f'http://localhost:56733/menu/table/{token}') # Must to change to menu select url
+    type(img)  # qrcode.image.pil.PilImage
+    img.save(f"app/static/qrcode/{id}.png")
+    return f"app/static/qrcode/{id}.png"
+
+def generate_jwt(table_number, count):
+    expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=48)
+    payload = {
+        'table_number': table_number,
+        'exp': expiration_time,
+        'count' : count
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return token
 
 @app.route('/payment/update', methods=('GET', 'POST'))
 @login_required
@@ -148,11 +180,12 @@ def slip_create():
         result = request.form.to_dict()
         table_id = result.get('table_id', '')
         app.logger.debug(table_id)
-        db_order = db.session.query(Order).filter(Order.table_id == table_id and Order.status != 'Paid').all() 
+        db_order = db.session.query(Order).filter((Order.table_id == table_id) & (Order.status != 'Paid')).all() 
         orders = list(map(lambda x: x.to_dict(), db_order))
         menu_list = dict()
         sum_list = dict()
         subtotal = 0
+        store = get_store_dict()
         for order in orders:
             subtotal += order['total_price']
             menu_list = merge_dict(menu_list, order['menu_list'])
@@ -163,8 +196,9 @@ def slip_create():
                                       'price_per_unit': menu['price'],
                                       'amount': menu_list[menu_id]}
     
-        vat = subtotal * 7 / 100
+        vat = subtotal * store['vat'] / 100
         temp = {'vat_7%': vat, 'total' : subtotal, 'sum_price': sum_list}
+        app.logger.debug(temp)
         return temp
 
 def merge_dict(A, B):
@@ -180,3 +214,8 @@ def get_menu_dict(id):
     db_menu = Menu.query.get(id)
     menu = db_menu.to_dict()
     return menu
+
+def get_store_dict():
+    db_store = Store.query.get(1)
+    store = db_store.to_dict()
+    return store

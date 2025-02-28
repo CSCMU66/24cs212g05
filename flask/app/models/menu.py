@@ -21,7 +21,8 @@ class Menu(db.Model, SerializerMixin):
         self.category = category
         self.image_url = image_url
         self.availability = availability
-        self.ordered = random.randint(0, 200)
+        # self.ordered = random.randint(0, 200)
+        self.ordered = 0
 
 
     def update(self, name, description, price, category, image_url, availability):

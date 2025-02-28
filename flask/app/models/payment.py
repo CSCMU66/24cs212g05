@@ -6,7 +6,7 @@ class Payment(db.Model, SerializerMixin):
     __tablename__ = "payments"
 
     payment_id = db.Column(db.Integer, primary_key=True)  # รหัสการชำระเงิน (Primary Key)
-    table_id = db.Column(db.Integer, nullable=False)  # รหัสคำสั่งซื้อที่ชำระ (Foreign Key)
+    table_id = db.Column(db.Integer, db.ForeignKey('Tables.table_id'), nullable=False)  # รหัสคำสั่งซื้อที่ชำระ (Foreign Key)
     payment_method = db.Column(db.String(50), nullable=False)  # วิธีการชำระเงิน (เงินสด, บัตรเครดิต, QR Payment)
     payment_time = db.Column(db.DateTime, nullable=False)  # เวลาที่ชำระ
     amount = db.Column(db.Float, nullable=False)  # ยอดชำระ
