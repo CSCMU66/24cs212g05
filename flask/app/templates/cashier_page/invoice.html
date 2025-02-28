@@ -158,15 +158,15 @@
     <div style="text-align: center; margin-top: 1.5rem;">
         <a href="#" id="print-qr-button" style="width: 11.5rem;"
             class="button is-medium is-link has-text-weight-bold is-responsive mr-3">
-            Print Invoice
+            พิมพ์ใบเสร็จ
         </a>
         <a href="#" id="confirm-button" style="width: 11.5rem;"
             class="button is-medium has-text-weight-bold is-responsive mr-3 is-success">
-            Confirm payment
+            ยืนยันการชำระเงิน
         </a>
         <a href="/cashier" id="home-button" class="button is-medium has-text-weight-bold is-responsive"
             style="background-color: coral; color: white; width: 11.5rem">
-            Home
+            กลับหน้าหลัก
         </a>
     </div>
 
@@ -233,30 +233,19 @@
                 }).then((paymentResult) => {
                     if (paymentResult.isConfirmed) {
                         // Second alert: Confirm table usage (existing logic)
-                        Swal.fire({
-                            title: `ยืนยันการเปิดใช้โต๊ะที่ ${table_id_}`,
-                            text: "คุณแน่ใจหรือไม่?",
-                            icon: "question",
-                            showCancelButton: true,
-                            confirmButtonText: "ใช่",
-                            cancelButtonText: "ยกเลิก"
-                        }).then((tableResult) => {
-                            if (tableResult.isConfirmed) {
-                                var data_ = { table_id: table_id_, status: "Available" };
-                                console.log("Sending data:", data_);
-                                $.post('/table/update', data_, function () {
-                                    Swal.fire("สำเร็จ!", "สถานะโต๊ะอัปเดตเรียบร้อย", "success")
-                                        .then(() => {
-                                            window.location.href = "/cashier";
-                                        });
-                                }).fail(function (error) {
-                                    console.error("Error updating table:", error);
-                                    Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะโต๊ะได้", "error");
+
+                        var data_ = { table_id: table_id_, status: "Available" };
+                        console.log("Sending data:", data_);
+                        $.post('/table/update', data_, function () {
+                            Swal.fire("สำเร็จ!", "สถานะโต๊ะอัปเดตเรียบร้อย", "success")
+                                .then(() => {
+                                    window.location.href = "/cashier";
                                 });
-                            } else {
-                                console.log("ผู้ใช้กดยกเลิกการใช้โต๊ะ");
-                            }
+                        }).fail(function (error) {
+                            console.error("Error updating table:", error);
+                            Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะโต๊ะได้", "error");
                         });
+
                     } else {
                         console.log("ผู้ใช้ระบุว่ายังไม่ชำระเงิน");
                         Swal.fire("แจ้งเตือน", "กรุณาชำระเงินก่อนดำเนินการต่อ", "warning");
