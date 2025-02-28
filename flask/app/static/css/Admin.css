@@ -1,136 +1,179 @@
 /* Custom Styles */
 body {
-  background-color: #f8f9fa;
-  color: #333333;
+  background-color: #f5f5f5;
+  color: #374151;
   font-family: "Poppins", sans-serif;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+}
+
+.navbar.is-dark {
+  background: linear-gradient(90deg, #6b48ff 0%, #8b5cf6 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-item, .navbar-link {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.navbar-dropdown {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-dropdown .navbar-item {
+  color: #374151;
+}
+
+.navbar-dropdown .navbar-item:hover {
+  background-color: #f3e8ff;
+  color: #6b48ff;
 }
 
 .sidebar {
-  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  background: #ffffff;
   min-height: 100vh;
-  padding: 20px;
-  box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+  padding: 30px; /* เพิ่ม padding เพื่อให้ภายใน sidebar ดูโปร่งขึ้น */
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
+  border-right: 1px solid #e5e7eb;
+  width: 300px; /* เพิ่มความกว้างของ sidebar */
 }
 
 .sidebar h1 {
-  font-size: 24px;
+  font-size: 28px; /* เพิ่มขนาดฟอนต์ของหัวข้อ */
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 30px;
+  color: #1f2937;
+  margin-bottom: 40px;
   text-align: center;
+  letter-spacing: 0.5px;
 }
 
 .sidebar a {
-  color: #333333;
-  display: block;
-  padding: 15px 20px;
-  margin: 10px 0;
-  font-size: 16px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  padding: 14px 20px; /* เพิ่ม padding เพื่อให้ลิงก์ดูใหญ่ขึ้น */
+  margin: 8px 0;
+  font-size: 16px; /* เพิ่มขนาดฟอนต์ */
+  border-radius: 10px;
   text-decoration: none;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: transparent;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .sidebar a:hover {
-  background-color: #e9ecef;
-  transform: translateX(5px);
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #f3e8ff;
+  color: #6b48ff;
 }
 
 .sidebar a.is-active {
-  background-color: #3498db;
+  background: linear-gradient(90deg, #6b48ff 0%, #8b5cf6 100%);
   color: #ffffff;
-  font-weight: bold;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(107, 72, 255, 0.3);
 }
 
 .sidebar a i {
-  margin-right: 10px;
-  color: #3498db;
+  margin-right: 12px; /* ปรับระยะห่างระหว่างไอคอนกับข้อความ */
+  color: #9ca3af;
+  font-size: 18px; /* เพิ่มขนาดไอคอน */
+  transition: all 0.3s ease;
+}
+
+.sidebar a.is-active i {
+  color: #ffffff;
 }
 
 .main-content {
   padding: 30px;
-  background-color: #f4eeee;
-  margin: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background-color: #f5f5f5;
+  margin: 0;
+  min-height: calc(100vh - 60px);
+  width: calc(100% - 300px); /* ปรับความกว้างของ main-content ให้สัมพันธ์กับ sidebar */
 }
 
 .card {
   background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
 }
 
 .card-header {
-  background: linear-gradient(145deg, #3498db, #2980b9);
-  padding: 20px;
-  border-bottom: none;
-  font-size: 22px;
+  background: linear-gradient(90deg, #6b48ff 0%, #8b5cf6 100%);
+  padding: 15px 20px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
+  border-bottom: none;
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
 }
 
 .card-content {
-  padding: 25px;
-  font-size: 16px;
-  color: #555555;
+  padding: 20px;
+  font-size: 15px;
+  color: #4b5563;
+  background-color: #ffffff;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
-    padding: 15px;
+    padding: 20px;
     min-height: auto;
     position: relative;
     box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    width: 100%; /* ปรับ sidebar ให้เต็มความกว้างบนหน้าจอเล็ก */
+  }
+
+  .sidebar a {
+    padding: 12px 15px;
   }
 
   .main-content {
     padding: 20px;
-    margin: 10px;
+    margin: 0;
+    width: 100%; /* ปรับ main-content ให้เต็มความกว้างบนหน้าจอเล็ก */
   }
 
   .card-header {
-    font-size: 20px;
+    font-size: 18px;
+    padding: 12px 15px;
   }
 
   .card-content {
-    padding: 20px;
+    padding: 15px;
   }
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
+/* Submenu and Dropdown */
 .submenu {
   display: none;
-  margin-left: 20px;
+  margin-left: 25px;
+  padding-top: 5px;
 }
 
 .menu-label.is-active + .submenu {
@@ -139,6 +182,10 @@ body {
 
 .dropdown-content {
   display: none;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
 }
 
 .dropdown.is-active .dropdown-content {
@@ -149,6 +196,76 @@ body {
   position: absolute;
   top: -5px;
   right: -5px;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  font-size: 0.65rem;
+  padding: 3px 6px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.menu-list li a {
+  min-height: 50px; /* Adjust the value to make each item taller */
+  display: flex;
+  align-items: center; /* Keep text vertically centered */
+  height: 3.5rem;
+}
+
+/* สไตล์สำหรับไอคอนแจ้งเตือน */
+#notificationIcon {
+  position: relative;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+#notificationIcon .notification-count {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* สไตล์สำหรับแถบแจ้งเตือน */
+.notification-sidebar {
+  position: fixed;
+  top: 0;
+  right: -400px; /* ซ่อนแถบแจ้งเตือนไว้ด้านนอกหน้าจอ */
+  width: 400px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.notification-sidebar.open {
+  right: 0; /* แสดงแถบแจ้งเตือน */
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-content {
+  padding: 20px;
+}
+
+.notification-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }

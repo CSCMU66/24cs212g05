@@ -18,19 +18,22 @@
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+  <nav class="navbar is-dark" style="height: 2.5rem;" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="#" id="title_" ><strong>Admin Panel</strong></a>
+      <a class="navbar-item" href="#" id="title_"><strong>{{current_user.firstname}} {{current_user.lastname}}</strong></a>
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarAdmin">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
       </a>
     </div>
-
     <div id="navbarAdmin" class="navbar-menu">
       <div class="navbar-end">
+                  <!-- ไอคอนสำหรับเปิด/ปิดแถบแจ้งเตือน -->
+    <div class="navbar-item" id="notificationIcon">
+      <span class="icon"><i class="fas fa-bell"></i></span>
+      <span class="notification-count">3</span> <!-- แสดงจำนวนการแจ้งเตือน -->
+      </div>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link"> <i class="fas fa-user"></i>&nbsp; {{ current_user.role }} </a>
           <div class="navbar-dropdown is-right">
@@ -46,6 +49,26 @@
     </div>
   </nav>
 
+  <div class="notification-sidebar" id="notificationSidebar">
+    <div class="notification-header">
+      <h3>การแจ้งเตือน</h3>
+      <button class="delete" id="closeNotificationSidebar"></button>
+    </div>
+    <div class="notification-content">
+      <div class="notification-item">
+        <p>มีออเดอร์ใหม่ #1234</p>
+        <small>2 นาทีที่แล้ว</small>
+      </div>
+      <div class="notification-item">
+        <p>มีรีวิวใหม่จากลูกค้า</p>
+        <small>5 นาทีที่แล้ว</small>
+      </div>
+      <div class="notification-item">
+        <p>มีการจองใหม่จากคุณสมชาย</p>
+        <small>10 นาทีที่แล้ว</small>
+      </div>
+    </div>
+  </div>
   <!-- Sidebar + Main Content -->
   <div class="columns is-gapless">
     <!-- Sidebar -->
@@ -148,6 +171,31 @@
         });
       });
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // เลือกไอคอนและแถบแจ้งเตือน
+      const notificationIcon = document.getElementById('notificationIcon');
+      const notificationSidebar = document.getElementById('notificationSidebar');
+      const closeNotificationSidebar = document.getElementById('closeNotificationSidebar');
+    
+      // เมื่อคลิกไอคอนแจ้งเตือน
+      notificationIcon.addEventListener('click', () => {
+        notificationSidebar.classList.toggle('open'); // เปิด/ปิดแถบแจ้งเตือน
+      });
+    
+      // เมื่อคลิกปุ่มปิดแถบแจ้งเตือน
+      closeNotificationSidebar.addEventListener('click', () => {
+        notificationSidebar.classList.remove('open'); // ปิดแถบแจ้งเตือน
+      });
+    
+      // ปิดแถบแจ้งเตือนเมื่อคลิกนอกพื้นที่
+      document.addEventListener('click', (event) => {
+        if (!notificationSidebar.contains(event.target) && !notificationIcon.contains(event.target)) {
+          notificationSidebar.classList.remove('open');
+        }
+      });
+    });
+
   </script>
 
   {% block extra_js %}{% endblock %}
