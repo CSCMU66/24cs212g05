@@ -188,6 +188,7 @@
     $(document).ready(function () {
       $.getJSON("/menu/menus", populate_table);
       console.log("{{ table_id }}");
+      console.log("{{ count }}");
       updateCart();
 
       $("#search-input-bottom").on("input", function () {
@@ -399,7 +400,7 @@
         alert("ทำการสั่งซื้อแล้ว!");
         console.log(cart);
         var time_ = new Date().toISOString();
-        let cart_send = { table_id: "{{ table_id }}", time: time_ };
+        let cart_send = { count: '{{ count }}', table_id: "{{ table_id }}", time: time_ };
         for (menu of cart) {
           cart_send[menu["id"]] = menu["quantity"];
         }

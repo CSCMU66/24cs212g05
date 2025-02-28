@@ -10,6 +10,7 @@ from app.controllers.role_controller import roles_required
 from app.models.order import Order
 from app.models.menu import Menu
 from app.models.noti import Noti
+from app.models.table import Tables
 
 
 
@@ -31,7 +32,7 @@ def order_create():
         
         result = request.form.to_dict()
         app.logger.debug(result)
-        valid_keys = ['table_id', 'time']
+        valid_keys = ['table_id', 'time', 'count']
         validated = True
         validated_dict = dict()
         validated_dict['menu_list'] = dict()
@@ -49,6 +50,14 @@ def order_create():
 
             validated_dict[key] = value
         app.logger.debug(validated_dict)
+        db_table = Tables.query.get(validated_dict['table_id'])
+        table = db_table.to_dict()
+        # app.logger.debug(table['count'] != str(validated_dict['count']))
+
+        if str(table['count']) != str(validated_dict['count']):
+            validated = False
+        
+        
         if validated:
             try:
                 temp = Order(
@@ -176,6 +185,9 @@ def order_update():
         validated_dict, validated = validate_data(result, ['order_id', 'status'])
 
         app.logger.debug(validated_dict)
+
+        if validated_dict['status'] not in ('Preparing', 'Ready', 'Served', 'Paid'):
+            validated = False
         if validated:
             try:
                 orders = Order.query.get(validated_dict['order_id'])
