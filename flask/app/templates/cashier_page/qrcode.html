@@ -172,7 +172,6 @@
                 alert("ไม่สามารถโหลดรูปภาพบางรูปได้ กรุณาตรวจสอบ URL");
             });
 
-            // พิมพ์เมื่อคลิกปุ่ม
             $("#print-qr-button").on("click", function (e) {
                 e.preventDefault();
 
@@ -180,30 +179,34 @@
                 html2canvas(element, {
                     scale: 2,
                     useCORS: true,
-                    logging: true // ช่วย debug
+                    logging: true // Helps with debugging
                 }).then(canvas => {
                     const imgData = canvas.toDataURL("image/png");
                     const { jsPDF } = window.jspdf;
+
+                    // Set PDF width to 80mm (standard receipt width)
+                    const pdfWidth = 80; // in mm
+                    // Calculate height based on canvas aspect ratio
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintains aspect ratio
+
                     const pdf = new jsPDF({
                         orientation: "portrait",
                         unit: "mm",
-                        format: [80, 150]
+                        format: [pdfWidth, pdfHeight] // Dynamic height
                     });
 
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
+                    // Add image with calculated dimensions
                     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
+                    // Open PDF in a new window for printing
                     const printWindow = window.open(pdf.output("bloburl"), "_blank");
 
                     printWindow.onload = function () {
                         printWindow.print();
                         setTimeout(() => {
                             printWindow.close();
-                        }, 3000);
-                    }
-                    printWindow.addEventListener("afterprint", () => { console.log(1111111); printWindow.close(); })
+                        }, 3000); // Close window after 3 seconds
+                    };
                 }).catch(error => {
                     console.error("Error generating PDF:", error);
                     alert("เกิดข้อผิดพลาดในการสร้างบิล กรุณาตรวจสอบคอนโซล");

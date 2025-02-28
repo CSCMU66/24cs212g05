@@ -166,7 +166,7 @@
     </div>
     <div style="text-align: center; margin-top: 1.5rem;">
         <a href="#" id="print-qr-button" class="button is-medium is-link has-text-weight-bold is-responsive mr-3">
-            Print QR
+            Print Invoice
         </a>
         <a href="/cashier" id="home-button" class="button is-medium has-text-weight-bold is-responsive"
             style="background-color: coral; color: white;">
@@ -192,75 +192,47 @@
 
             $('#time').text(`${formattedUtcDate} น.`)
 
-            //     // แปลง QR Code URL เป็นรูปภาพ
-            //     var qrCodeValue = $("#qrcode").text();
-            //     $("#qrcode").html(qrcodeFormatter(qrCodeValue));
+            $("#print-qr-button").on("click", function (e) {
+                e.preventDefault();
 
-            //     // รอให้รูปภาพโหลดก่อนพิมพ์
-            //     const logoImg = document.getElementById("logo-image");
-            //     const qrImg = $("#qrcode img")[0];
-            //     const images = [logoImg, qrImg];
+                const element = document.getElementById("slip-content");
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: true // Helps with debugging
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const { jsPDF } = window.jspdf;
 
-            //     Promise.all(
-            //         images.map(img => {
-            //             return new Promise((resolve, reject) => {
-            //                 img.onload = resolve;
-            //                 img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
-            //                 if (img.complete) resolve(); // ถ้ารูปโหลดเสร็จแล้ว
-            //             });
-            //         })
-            //     ).then(() => {
-            //         console.log("All images loaded successfully");
-            //     }).catch(error => {
-            //         console.error(error);
-            //         // alert("ไม่สามารถโหลดรูปภาพบางรูปได้ กรุณาตรวจสอบ URL");
-            //     });
+                    // Set PDF width to 80mm (standard receipt width)
+                    const pdfWidth = 80; // in mm
+                    // Calculate height based on canvas aspect ratio
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintains aspect ratio
 
-            //     // พิมพ์เมื่อคลิกปุ่ม
-            //     $("#print-qr-button").on("click", function (e) {
-            //         e.preventDefault();
+                    const pdf = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: [pdfWidth, pdfHeight] // Dynamic height
+                    });
 
-            //         const element = document.getElementById("slip-content");
-            //         html2canvas(element, {
-            //             scale: 2,
-            //             useCORS: true,
-            //             logging: true // ช่วย debug
-            //         }).then(canvas => {
-            //             const imgData = canvas.toDataURL("image/png");
-            //             const { jsPDF } = window.jspdf;
-            //             const pdf = new jsPDF({
-            //                 orientation: "portrait",
-            //                 unit: "mm",
-            //                 format: [80, 150]
-            //             });
+                    // Add image with calculated dimensions
+                    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-            //             const pdfWidth = pdf.internal.pageSize.getWidth();
-            //             const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    // Open PDF in a new window for printing
+                    const printWindow = window.open(pdf.output("bloburl"), "_blank");
 
-            //             pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-            //             const printWindow = window.open(pdf.output("bloburl"), "_blank");
-
-            //             printWindow.onload = function () {
-            //                 printWindow.print();
-            //                 setTimeout(() => {
-            //                     printWindow.close();
-            //                 }, 3000);
-            //             }
-            //             printWindow.addEventListener("afterprint", () => { console.log(1111111); printWindow.close(); })
-            //         }).catch(error => {
-            //             console.error("Error generating PDF:", error);
-            //             alert("เกิดข้อผิดพลาดในการสร้างบิล กรุณาตรวจสอบคอนโซล");
-            //         });
-            //     });
-            // });
+                    printWindow.onload = function () {
+                        printWindow.print();
+                        setTimeout(() => {
+                            printWindow.close();
+                        }, 3000); // Close window after 3 seconds
+                    };
+                }).catch(error => {
+                    console.error("Error generating PDF:", error);
+                    alert("เกิดข้อผิดพลาดในการสร้างบิล กรุณาตรวจสอบคอนโซล");
+                });
+            });
         });
-
-        // function qrcodeFormatter(value) {
-        //     const formattedUrl = value.replace("app/", "/");
-        //     return `<img src="${formattedUrl}" alt="QR Image" style="width: 250px; height: auto;">`;
-        // }
-
 
         function updateDetails(table_id_) {
             console.log(2222222222)
@@ -279,7 +251,8 @@
             })
 
         }
-        const create_list = (data, total, vat) => {
+
+        function create_list(data, total, vat) {
             let totalamout = 0
             if (typeof data !== 'object' || data === null) {
                 console.error('Expected an object with item data');
@@ -314,7 +287,7 @@
             });
 
             listItems += `
-                <hr/>
+                <hr>
             <li class="item">
                 <span class="item-name">ราคาไม่รวม vat</span>  <!-- Assuming 'name' is a field -->
                 <span class="item-amount"></span>
@@ -345,12 +318,20 @@
             listItems += `
                 
             <li class="item">
-                <span class="item-name">ราคารวม vat 7% (ปัดเศษ)</span>  <!-- Assuming 'name' is a field -->
-                <span class="item-amount"></span>
-                <span class="item-price-per-unit"></span>
+                    <span class="item-name">ราคารวม vat 7% (ปัดเศษ)</span>  <!-- Assuming 'name' is a field -->
+                    <span class="item-amount"></span>
+                    <span class="item-price-per-unit"></span>
                 <span class="item-price">${Math.floor(vat + total)}</span>
             </li>
         `;
+
+            listItems += `
+                <hr>
+            <div style="display: flex; justify-content: center;">
+                <p>ขอบคุณที่มาใช้บริการครับ/ค่ะ</p>
+            </div>
+        `;
+
             listItems += '</ul>';
             $('#details').html(listItems);
         };
