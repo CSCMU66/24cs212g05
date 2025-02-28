@@ -55,13 +55,13 @@ def table_create():
                 db.session.add(Tables(qrcode=qrCode))
                 db.session.commit()
 
-                newNoti = Noti(                    
-                    type="Table",
-                    message="มีการเพิ่มโต๊ะใหม่",
-                    link='http://localhost:56733/menu'
-                )
-                db.session.add(newNoti)
-                db.session.commit()
+                # newNoti = Noti(                    
+                #     type="Table",
+                #     message="มีการเพิ่มโต๊ะใหม่",
+                #     link='http://localhost:56733/table/create_new'
+                # )
+                # db.session.add(newNoti)
+                # db.session.commit()
                 
             except Exception as ex:
                 app.logger.error(f"Error create new table: {ex}")
@@ -129,7 +129,7 @@ def table_admin():
                     newNoti = Noti(                
                         type="Table",
                         message="มีการเพิ่มโต๊ะใหม่ ไอดีที่ " + str(next_menu_id),
-                        link='http://localhost:56733/menu'
+                        link='http://localhost:56733/table/create_new'
                     )
                     db.session.add(newNoti)
 
@@ -139,7 +139,7 @@ def table_admin():
                     newNoti = Noti(                    
                         type="Table",
                         message="มีการแก้ไขโต๊ะ ไอดีที่ " + str(id_),
-                        link='http://localhost:56733/menu'
+                        link='http://localhost:56733/table/create_new'
                     )
                     db.session.add(newNoti)
                     db.session.commit()
@@ -149,7 +149,7 @@ def table_admin():
                         newNoti = Noti(                    
                             type="Order",
                             message="มีการแก้ไขโต๊ะ",
-                            link='http://localhost:56733/menu'
+                            link='http://localhost:56733/table/create_new'
                         )
                         db.session.add(newNoti)
                         table.change_qrcode(qrcode)
@@ -200,22 +200,22 @@ def table_update():
             try:
                 table = Tables.query.get(validated_dict['table_id'])
                 table.update_status(validated_dict['status'])
-                newNoti = Noti(                    
-                        type="Table",
-                        message="มีการแก้ไขโต๊ะ",
-                        link='http://localhost:56733/menu'
-                )
-                db.session.add(newNoti)
+                # newNoti = Noti(                    
+                #         type="Table",
+                #         message="มีการแก้ไขโต๊ะ",
+                #         link='http://localhost:56733/table/create_new'
+                # )
+                # db.session.add(newNoti)
                 
                 if validated_dict['status'] == 'Available':
                     table = Tables.query.get(validated_dict['table_id'])
                     qrcode = gennerate_qrcode(table.table_id, table.count)
-                    newNoti = Noti(                    
-                        type="Table",
-                        message="มีการแก้ไขโต๊ะ ไอดีที่" + str(valid_keys['table_id']),
-                        link='http://localhost:56733/menu'
-                    )
-                    db.session.add(newNoti)
+                    # newNoti = Noti(                    
+                    #     type="Table",
+                    #     message="มีการแก้ไขโต๊ะ ไอดีที่" + str(valid_keys['table_id']),
+                    #     link='http://localhost:56733/table/create_new'
+                    # )
+                    # db.session.add(newNoti)
                     table.change_qrcode(qrcode)
                 db.session.commit()
             except Exception as ex:
@@ -254,8 +254,8 @@ def table_delete():
                 table.update_status('Disable')
                 newNoti = Noti(                    
                     type="Table",
-                    message="มีการแก้ไขโต๊ะ",
-                    link='http://localhost:56733/menu'
+                    message="มีการลบไขโต๊ะ",
+                    link='http://localhost:56733/table/create_new'
                 )
                 db.session.add(newNoti)
                 db.session.commit()
@@ -297,7 +297,7 @@ def table_cancle():
                 newNoti = Noti(                    
                     type="Table",
                     message="มีการ cancle โต๊ะ",
-                    link='http://localhost:56733/menu'
+                    link='http://localhost:56733/table/create_new'
                 )
                 db.session.add(newNoti)
                 db.session.commit()
