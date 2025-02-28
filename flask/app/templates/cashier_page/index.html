@@ -321,7 +321,7 @@
         return data.filter(row => {
             return Object.values(row).some(value => {
                 if (value !== null) {
-                    var value_;
+                    let value_;
 
                     if (value === "Available") {
                         value_ = "พร้อมใช้งาน"
@@ -333,14 +333,13 @@
                         value_ = "มีผู้ใช้งาน"
 
                     } else {
-                        value_ = "ชำระเงินแล้ว"
+                        value_ = value;
 
                     }
 
                     return value_.toString().toLowerCase().includes(searchText);
                 }
 
-                return false;
             });
         });
     }
