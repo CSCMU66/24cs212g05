@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <!-- New Card for Customer Insights -->
+  <!-- Customer Insights Card -->
   <div class="column is-half">
     <div class="card">
       <div class="card-content">
@@ -36,6 +36,28 @@
           </div>
         </div>
         <canvas id="customerChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Methods Card -->
+<div class="row mt-5 is-flex is-justify-content-space-between">
+  <div class="column is-half">
+    <div class="card">
+      <div class="card-content">
+        <h2 class="subtitle">Payment Methods</h2>
+        <div class="field is-grouped">
+          <div class="control is-expanded">
+            <select id="paymentMethodTimeSelector">
+              <option value="all_time">All Time</option>
+              <option value="yearly">Yearly</option>
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="paymentMethodChart"></canvas>
       </div>
     </div>
   </div>
