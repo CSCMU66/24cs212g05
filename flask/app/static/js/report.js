@@ -1,6 +1,7 @@
 $(document).ready(function () {
   fetchAndDrawRevenueChart();
   fetchAndDrawCustomerChart(); // Initialize customer chart
+  fetchAndDrawPaymentMethodChart(); // Initialize payment methods chart
 
   $("#yearSelector").on("change", function () {
     fetchAndDrawRevenueChart();
@@ -13,10 +14,15 @@ $(document).ready(function () {
   $("#customerTimeSelector").on("change", function () {
     fetchAndDrawCustomerChart(); // Update customer chart when selector changes
   });
+
+  $("#paymentMethodTimeSelector").on("change", function () {
+    fetchAndDrawPaymentMethodChart(); // Update payment methods chart when selector changes
+  });
 });
 
 let revenueChart;
 let customerChart;
+let paymentMethodChart;
 
 function populateYearSelector(data) {
   const years = [...new Set(data.map((p) => new Date(p.payment_time).getFullYear()))].sort().reverse();
@@ -147,5 +153,58 @@ function fetchAndDrawCustomerChart() {
     });
   }).fail((jqXHR, textStatus, errorThrown) => {
     console.error("Error fetching customer data:", textStatus, errorThrown);
+  });
+}
+
+// Function to fetch and draw payment methods chart
+function fetchAndDrawPaymentMethodChart() {
+  const timeFrame = $("#paymentMethodTimeSelector").val();
+  const apiUrl = `/${timeFrame}_payment_methods`;
+
+  $.getJSON(apiUrl, function (data) {
+    const paymentMethods = Object.keys(data);
+    const paymentData = Object.values(data);
+
+    const ctx = document.getElementById("paymentMethodChart").getContext("2d");
+    if (paymentMethodChart) paymentMethodChart.destroy();
+
+    paymentMethodChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: paymentMethods,
+        datasets: [
+          {
+            label: `Payment Methods (${timeFrame.replace("_", " ")})`,
+            data: paymentData,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.5)",
+              "rgba(54, 162, 235, 0.5)",
+              "rgba(75, 192, 192, 0.5)",
+              "rgba(255, 206, 86, 0.5)",
+              "rgba(153, 102, 255, 0.5)",
+              "rgba(255, 159, 64, 0.5)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(75, 192, 192, 1)",
+              "rgba(255, 206, 86, 1)",
+              "rgba(153, 102, 255, 1)",
+              "rgba(255, 159, 64, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: `Payment Methods (${timeFrame.replace("_", " ")})` },
+        },
+      },
+    });
+  }).fail((jqXHR, textStatus, errorThrown) => {
+    console.error("Error fetching payment methods data:", textStatus, errorThrown);
   });
 }
