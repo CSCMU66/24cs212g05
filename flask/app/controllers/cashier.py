@@ -31,3 +31,10 @@ def invoice():
     payment_method = request.args.get('payment_method')
     print(payment_method)
     return render_template('cashier_page/invoice.html', table_id=table_id, payment_method=payment_method)
+
+
+
+
+@app.route('/customer')
+def customer():
+    return render_template('cashier_page/customer.html')

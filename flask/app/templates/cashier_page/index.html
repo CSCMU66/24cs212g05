@@ -466,23 +466,24 @@
                     <option value="cash">เงินสด</option>
                     <option value="credit_card">บัตรเครดิต</option>
                     <option value="bank_transfer">โอนผ่านธนาคาร</option>
-                    <option value="paypal">Paypal</option>
+                    <option value="promtpay">Promptpay</option>
                 </select>
             `,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "ใช่",
         cancelButtonText: "ยกเลิก",
-        preConfirm: () => {
-          const selectedPayment =
-            document.getElementById("payment-method").value;
-          if (!selectedPayment) {
-            Swal.showValidationMessage("กรุณาเลือกวิธีการชำระเงิน");
-          }
-          return selectedPayment;
-        },
       }).then((result) => {
         if (result.isConfirmed) {
+          // if (result.value === "promtpay") {
+          //   $.post("/customer", function (data) {
+              
+
+          //   });
+
+          // }
+
+
           let tableId = encodeURIComponent(rowData.table_id);
           let payment_method = encodeURIComponent(result.value);
 
@@ -490,6 +491,7 @@
 
           // Redirect to invoice.html
           window.location.href = url;
+
         } else {
           console.log("ผู้ใช้กด Cancel");
         }
