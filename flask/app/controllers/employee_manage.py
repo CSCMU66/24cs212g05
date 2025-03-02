@@ -86,10 +86,8 @@ def em_db_ems():
     ems = []
     # ดึงข้อมูลจากฐานข้อมูล พร้อมเรียงลำดับตาม name
     db_employees = Employee.query.all()
-
     ems = list(map(lambda x: x.to_dict(), db_employees))
     app.logger.debug("DB employees (Sorted): " + str(ems))
-
     return jsonify(ems)
 
 @app.route('/em/remove_em', methods=('GET', 'POST'))
@@ -102,7 +100,7 @@ def em_remove_em():
         id_ = result.get('id', '')
         try:
             em = Employee.query.get(id_)
-            db.session.delete(em)
+            em.change_status('Disable')
             db.session.commit()
 
             newNoti = Noti(                    

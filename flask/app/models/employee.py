@@ -14,8 +14,10 @@ class Employee(db.Model, UserMixin):
     lastname = db.Column(db.String(100))
     phone = db.Column(db.String(12), nullable=False)
     role = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String, default="Enable")
     '''
     role : Cashier, Chef, Waiter, Admin
+    status : Enable, Disable
     '''
 
     def __init__(self, firstname, username, password, phone, role, lastname=None):
@@ -27,7 +29,6 @@ class Employee(db.Model, UserMixin):
         self.role = role
 
     def update(self, firstname, username, password, phone, role, lastname=None):
-        # print("eieieieeieieieii")
         self.username = username
         self.password = password
         self.firstname = firstname
@@ -43,6 +44,10 @@ class Employee(db.Model, UserMixin):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'phone': self.phone,
-            'role': self.role
+            'role': self.role,
+            'status': self.status
         }
+    
+    def change_status(self, status):
+        self.status = status
 

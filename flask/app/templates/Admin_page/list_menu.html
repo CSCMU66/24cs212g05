@@ -166,6 +166,7 @@
 </div>
 </div>
 {% endblock %} {% block extra_js %}
+<script src="{{ url_for('static', filename='js/notification.js') }}"></script>
 <script>
   function populate_table(table_data) {
     $("#menu-table").bootstrapTable({
@@ -243,7 +244,6 @@
     event.preventDefault();
   
     var formData = new FormData(this);
-  
     var url = "/menu";
   
     $.ajax({
@@ -261,6 +261,7 @@
         console.error("Error:", error);
       },
     });
+    fetchNotifications()
   });
 
   function clearForm() {
@@ -321,6 +322,7 @@
     }).fail(function () {
       alert("Failed to delete menu with ID " + row.id);
     });
+    fetchNotifications()
   }
 
   $("#add_menu").click(function () {

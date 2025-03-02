@@ -1,6 +1,7 @@
 {% extends 'Admin_page/base.html' %}
 {% block content %}
-<div class="row mt-5 is-flex is-justify-content-space-between">
+<div class="columns mt-5 is-multiline">
+  <!-- Revenue Overview -->
   <div class="column is-half">
     <div class="card">
       <div class="card-content">
@@ -16,6 +17,56 @@
           </div>
         </div>
         <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Insights -->
+  <div class="column is-half">
+    <div class="card">
+      <div class="card-content">
+        <h2 class="subtitle">Customer Insights</h2>
+        <div class="field">
+          <div class="control is-expanded">
+            <select id="customerTimeSelector" class="select2">
+              <option value="all_time">All Time</option>
+              <option value="yearly">Yearly</option>
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="customerChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="column is-half">
+    <div class="card">
+      <div class="card-content">
+        <h2 class="subtitle">Payment Methods</h2>
+        <div class="field">
+          <div class="control is-expanded">
+            <select id="paymentMethodTimeSelector" class="select2">
+              <option value="all_time">All Time</option>
+              <option value="yearly">Yearly</option>
+              <option value="monthly">Monthly</option>
+              <option value="weekly" selected>Weekly</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="paymentMethodChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Roles -->
+  <div class="column is-half">
+    <div class="card">
+      <div class="card-content">
+        <h2 class="subtitle">Employee Roles</h2>
+        <canvas id="employeeRolesChart"></canvas>
       </div>
     </div>
   </div>

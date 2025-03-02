@@ -149,6 +149,9 @@
             <th data-field="role" data-sortable="true">
               <span class="has-text-black"> Role </span>
             </th>
+            <th data-field="status" data-sortable="true">
+              <span class="has-text-black"> status </span>
+            </th>
             <th
               data-field="operation"
               data-formatter="actionFormatter"
@@ -166,6 +169,7 @@
   </div>
 </div>
 {% endblock %} {% block extra_js %}
+<script src="{{ url_for('static', filename='js/notification.js') }}"></script>
 <script>
   function populate_employee_table(employee_data) {
     $("#employee-table").bootstrapTable({
@@ -203,6 +207,7 @@
       clearForm();
       toggleView();
     });
+    fetchNotifications()
   });
 
   function clearForm() {
@@ -263,6 +268,7 @@
     }).fail(function () {
       alert("Failed to delete Employee with ID " + row.id);
     });
+    fetchNotifications()
   }
 
   $("#add_employee").click(function () {

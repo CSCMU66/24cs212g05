@@ -162,7 +162,7 @@ def payment_delete():
         if validated:
             try:
                 payment = Payment.query.get(validated_dict['payment_id'])
-                db.session.delete(payment)
+                payment.update_status('Disable')
                 db.session.commit()
                 
             except Exception as ex:
