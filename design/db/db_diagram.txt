@@ -1,0 +1,99 @@
+
+
+Table "Tables" {
+  "table_id" integer [pk, not null]
+  "qrcode" "character varying(100)"
+  "status" "character varying(20)" [not null]
+  "count" integer [not null]
+}
+
+Table "employee" {
+  "id" integer [pk, not null]
+  "username" "character varying" [not null]
+  "password" "character varying" [not null]
+  "firstname" "character varying(100)" [not null]
+  "lastname" "character varying(100)"
+  "phone" "character varying(12)" [not null]
+  "role" "character varying(50)" [not null]
+  "status" "character varying"
+}
+
+Table "menu" {
+  "id" integer [pk, not null]
+  "name" "character varying(100)"
+  "description" text
+  "price" doubleprecision [not null]
+  "category" "character varying(50)" [not null]
+  "image_url" "character varying(255)"
+  "availability" boolean [not null]
+  "ordered" integer
+  "status" "character varying"
+}
+
+Table "noti" {
+  "notification_id" integer [pk, not null]
+  "type" "character varying(20)" [not null]
+  "message" "character varying(255)" [not null]
+  "link" "character varying(255)"
+  "created_at" timestamp [not null]
+  "is_read" boolean
+  "related_id" integer
+}
+
+Table "orders" {
+  "order_id" integer [pk, not null]
+  "table_id" integer [not null]
+  "order_time" timestamp [not null]
+  "status" "character varying(20)" [not null]
+  "menu_list" json [not null]
+  "total_price" doubleprecision [not null]
+}
+
+Table "payments" {
+  "payment_id" integer [pk, not null]
+  "table_id" integer [not null]
+  "payment_method" "character varying(50)" [not null]
+  "payment_time" timestamp [not null]
+  "amount" doubleprecision [not null]
+  "status" "character varying"
+}
+
+Table "reserve" {
+  "reserve_id" integer [pk, not null]
+  "table_id" integer [not null]
+  "reserve_time" timestamp [not null]
+  "customer_name" "character varying" [not null]
+  "customer_phone_number" "character varying" [not null]
+  "cashier_id" integer [not null]
+  "status" "character varying"
+}
+
+Table "review" {
+  "review_id" integer [pk, not null]
+  "name" "character varying(100)"
+  "review" "character varying(250)"
+  "star" integer
+  "status" "character varying"
+}
+
+Table "store" {
+  "id" integer [pk, not null]
+  "name" "character varying(100)"
+  "vat" doubleprecision
+  "service_charge" doubleprecision
+  "Max_Menu_per_Round" integer
+  "Max_Food_Quantity_per_Order" integer
+  "Tax" "character varying(100)"
+  "Promptpay_id" "character varying(13)"
+  "Promptpay_name" "character varying(100)"
+}
+
+Ref "orders_table_id_fkey":"Tables"."table_id" < "orders"."table_id"
+
+Ref "payments_table_id_fkey":"Tables"."table_id" < "payments"."table_id"
+
+Ref "reserve_table_id_fkey":"Tables"."table_id" < "reserve"."table_id"
+
+
+
+Ref: "orders"."menu_list" < "menu"."id"

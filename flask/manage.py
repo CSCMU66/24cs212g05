@@ -183,18 +183,18 @@ def seed_db():
             return random_date
 
     # ใช้สุ่มค่าเวลาในโค้ดหลัก
-    large_list = [{
-        random.randint(1, 20): random.randint(1, 10) for _ in range(random.randint(1, 5))
-    } for _ in range(5)]
+    # large_list = [{
+    #     random.randint(1, 20): random.randint(1, 10) for _ in range(random.randint(1, 5))
+    # } for _ in range(5)]
 
-    for menu_list in large_list:
-        temp = Order(
-            table_id=random.randint(1, 20),
-            time=random_date(),
-            menu_list=menu_list
-        )
-        temp.change_price(cal_price(menu_list))
-        db.session.add(temp)
+    # for menu_list in large_list:
+    #     temp = Order(
+    #         table_id=random.randint(1, 20),
+    #         time=random_date(),
+    #         menu_list=menu_list
+    #     )
+    #     temp.change_price(cal_price(menu_list))
+    #     db.session.add(temp)
         
     db.session.commit()
 
@@ -236,8 +236,8 @@ def seed_db():
         for i in range(num_payments)
     ]
 
-    for table_id, payment_method, payment_time, amount in sample_payments:
-        db.session.add(Payment(table_id=table_id, payment_method=payment_method, payment_time=payment_time, amount=amount))
+    # for table_id, payment_method, payment_time, amount in sample_payments:
+    #     db.session.add(Payment(table_id=table_id, payment_method=payment_method, payment_time=payment_time, amount=amount))
 
     #?-------------------------------------------------------------------------
     db.session.add(Review(name='people1', star=5, review='แซ่บหลาย'))

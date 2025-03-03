@@ -12,10 +12,12 @@ from app import db
 # Define the paths for sounds and logos
 SOUNDS_FOLDER = os.path.join(app.static_folder, 'sounds')
 LOGO_FOLDER = os.path.join(app.static_folder, 'ico')
+ICO_FOLDER = os.path.join(app.static_folder, 'img')
 
 # Ensure the directories exist
 os.makedirs(SOUNDS_FOLDER, exist_ok=True)
 os.makedirs(LOGO_FOLDER, exist_ok=True)
+os.makedirs(ICO_FOLDER, exist_ok=True)
 
 @app.route('/setting', methods=['GET', 'POST'])
 @login_required
@@ -63,6 +65,22 @@ def setting():
                 if logo_file.filename != '':
                     filename = "logo.jpg"
                     logo_file.save(os.path.join(LOGO_FOLDER, filename))
+                    response_data['message'] = 'อัปโหลดโลโก้สำเร็จ'
+                    response_data['success'] = True
+
+                    newNoti = Noti(                    
+                        type="Setting",
+                        message="มีการแก้ไขโลโก้ร้าน",
+                        link='http://localhost:56733/setting'
+                    )
+                    db.session.add(newNoti)
+                    db.session.commit()
+
+            if 'ico_file' in request.files:
+                ico_file = request.files['ico_file']
+                if ico_file.filename != '':
+                    filename = "favicon.ico"
+                    ico_file.save(os.path.join(ICO_FOLDER, filename))
                     response_data['message'] = 'อัปโหลดโลโก้สำเร็จ'
                     response_data['success'] = True
 

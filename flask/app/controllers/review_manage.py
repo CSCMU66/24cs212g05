@@ -57,7 +57,6 @@ def review_create():
                 db.session.add(newNoti)
                 db.session.commit()
 
-                print('ผ่านเหี้ยนี่')
 
             except Exception as ex:
                 app.logger.error(f"Error create new review: {ex}")

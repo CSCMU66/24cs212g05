@@ -12,6 +12,7 @@ $(document).ready(function () {
   fetchtotalMenuItems();
   fetchTop5Menus();
   fetchLatestReviews();
+  fetchUsingTable();
 
   // Toggle Filter Container
   $("#toggleFilterButton").click(function () {
@@ -23,6 +24,7 @@ $(document).ready(function () {
     fetchTotalSale();
     fetchTotalOrder();
     fetchTop5Menus();
+    fetchUsingTable();
   });
 
   // Time Range Change
@@ -80,6 +82,8 @@ $(document).ready(function () {
     fetchTotalSale();
     fetchTotalOrder();
     fetchTop5Menus();
+    fetchUsingTable();
+    
   });
 });
 
@@ -136,6 +140,21 @@ function fetchtotalMenuItems() {
     $("#totalMenuItems").text(data.length);
   }).fail(function () {
     $("#totalMenuItems").text("เกิดข้อผิดพลาด");
+  });
+}
+
+function fetchUsingTable() {
+  $.getJSON("/table/get_all_table", function (data) {
+    let count = 0;
+    data.forEach(table => {
+      // console.log(table)
+      if(table['status'] === 'Occupied'){
+        count++;
+      }
+    });
+    $('#totalTable').text(count);
+  }).fail(function () {
+    $('#totalTable').text('เกิดข้อผิดพลาด');
   });
 }
 
