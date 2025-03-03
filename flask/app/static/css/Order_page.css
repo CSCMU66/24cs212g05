@@ -199,8 +199,8 @@
 }
 
 .list-view-item img {
-  width: 100vw;
-  height: 100vh;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   margin-right: 16px;
   border-radius: 8px;
