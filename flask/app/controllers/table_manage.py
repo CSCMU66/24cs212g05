@@ -79,10 +79,10 @@ def gennerate_qrcode(id, count):
             token = generate_jwt(id, count)
             img = qrcode.make(f'{public_url}/menu/table/{token}') # Must to change to menu select url
             type(img)  # qrcode.image.pil.PilImage
-            img.save(f"app/static/qrcode/{id}.png")
+            img.save(f"static/qrcode/{id}.png")
             return f"app/static/qrcode/{id}.png"
         else:
-            print(f"Failed to retrieve ngrok URL. Status code: {response.status_code}")
+            app.logger.debug(f"Failed to retrieve ngrok URL. Status code: {response.status_code}")
         return ""
 
     

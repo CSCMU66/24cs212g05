@@ -16,7 +16,7 @@ app.jinja_options.update({
     'lstrip_blocks': True
 })
 
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 app.config['SECRET_KEY'] = \
     '0adc9fde45a2d07af00cc2f2ec8250a267dd26a3d217228c'
 app.config['JSON_AS_ASCII'] = False

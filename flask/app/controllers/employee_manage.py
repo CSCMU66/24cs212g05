@@ -22,13 +22,12 @@ def em_list():
         validated = True
         validated_dict = dict()
         valid_keys = ['username', 'password', 'firstname', 'lastname', 'phone', 'role']
-        print("ผ่าน valid_keys = ['username', 'password', 'firstname', 'lastname', 'phone', 'role']")
 
         # Validate the input
         for key in result:
             if key not in valid_keys:
                 continue
-            print(result[key])
+            
             value = result[key].strip()
             if not value or value == 'undefined':
                 validated = False
@@ -44,13 +43,13 @@ def em_list():
         user = Employee.query.filter_by(username=validated_dict['username']).with_for_update().first()
         validated_dict['password'] = generate_password_hash(validated_dict['password'], method='sha256')
         validated_dict['phone'] = phonenumber_format(validated_dict['phone'])
-        # print(validated_dict['password'])
+        
         
         if validated:
             app.logger.debug('Validated dict: ' + str(validated_dict))
             
             if not id_:  # ถ้าไม่มี id => เพิ่มใหม่
-                print("ไม่ผ่าน เช็คซ้ำ")
+                
                 entry = Employee(**validated_dict)
                 db.session.add(entry)
                 last_employee = Employee.query.order_by(Employee.id.desc()).first()
@@ -65,7 +64,6 @@ def em_list():
                 db.session.commit()
 
             else:  # ถ้ามี id => แก้ไขรายการเดิม
-                print("ผ่าน เช็คซ้ำ")
                 employee = Employee.query.get(id_)
                 if employee:
                     for key, value in validated_dict.items():
@@ -123,7 +121,6 @@ def phonenumber_format(phonenumber):
     temp = ''
     for digit in phonenumber:
         if digit.isdigit():
-            # print(digit)
             temp += digit
     if len(temp) != 10:
         return 'Wrong Format'

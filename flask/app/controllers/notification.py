@@ -24,7 +24,7 @@ def create_notification():
 
 @app.route('/api/notifications/<int:notification_id>', methods=['PUT'])
 def update_notification(notification_id):
-    print("เรียกใช้งานเหี้ย1")
+    # print("เรียกใช้งานเหี้ย1")
     notif = Noti.query.get_or_404(notification_id)
     data = request.get_json()
     if 'is_read' in data:
