@@ -104,6 +104,7 @@
       Add/Edit an Order:
     </h2>
     <form id="addOrderForm" class="box">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="field" hidden>
         <label class="label has-text-black" for="order_id" hidden>Order ID</label>
         <div class="control" hidden>

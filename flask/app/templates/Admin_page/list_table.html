@@ -8,6 +8,7 @@
       Add/Edit a Table:
     </h2>
     <form id="addTableForm" class="box">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="field">
         <input class="input" type="hidden" id="table_id" value="table_id" name="table_id">
         <label class="label has-text-black" for="status">Status</label>

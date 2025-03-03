@@ -63,8 +63,8 @@ def payment_create():
                 change_order_status(table_id)
                 table = Tables.query.get(table_id)
                 table.update_status('Available')
-                qrcode = gennerate_qrcode(table.table_id, table.count)
-                table.change_qrcode(qrcode)
+                # qrcode = gennerate_qrcode(table.table_id, table.count)
+                # table.change_qrcode(qrcode)
                 
                 db.session.commit()
                 

@@ -8,6 +8,7 @@
       Add/Edit a Menu:
     </h2>
     <form id="addMenuForm" class="box">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="field">
         <label class="label has-text-black" for="name">Menu Name</label>
         <div class="control">
