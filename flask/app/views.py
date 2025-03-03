@@ -20,7 +20,7 @@ from manage import SECRET_KEY
 หน้า Admin
 '''
 from app.controllers import Admin
-
+from app.controllers import review_manage
 '''
 หน้าอื่น ๆ
 '''
@@ -30,18 +30,6 @@ from app.controllers import review
 from app.controllers import waiter
 from app.controllers import cookingroom
 from app.controllers import customer_table
-
-@app.route('/table/test')
-@login_required
-@roles_required('Admin')
-def table_test():
-    return render_template('test_bend.html')
-
-@app.route('/table/create_new')
-@login_required
-@roles_required('Admin')
-def table_creates():
-    return render_template('Admin_page/list_table.html')
 
 
 

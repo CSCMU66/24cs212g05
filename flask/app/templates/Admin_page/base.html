@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Admin.css') }}" />
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico" />
   {% block extra_css %}{% endblock %}
 </head>
 
@@ -65,8 +66,9 @@
           </li>
           <li>
             <a id="management-label"
-              class="menu-label {% if request.endpoint in ['table_creates', 'menu_list', 'em_list'] %} is-active {% endif %}">
-              <i class="fas fa-cogs"></i>&nbsp; การจัดการ
+            style="margin-bottom: 0px;"
+              class="menu-label {% if request.endpoint in ['table_creates', 'menu_list', 'em_list'] %} is-active {% endif %}" style="">
+              <i class="fas fa-cogs"></i>&nbsp;การจัดการ
             </a>
             <ul class="submenu">
               <li>
@@ -83,7 +85,7 @@
               </li>
               <li>
                 <a href="{{ url_for('em_list') }}" class="{% if request.endpoint == 'em_list' %}is-active{% endif %}">
-                  <i class="fas fa-users"></i>&nbsp; การจัดการพนักงาน
+                  <i class="fas fa-users"></i>&nbsp;การจัดการพนักงาน
                 </a>
               </li>
             </ul>
@@ -100,7 +102,7 @@
               <i class="fas fa-star"></i>&nbsp; รีวิว
             </a>
           </li>
-          <li>
+          <!-- <li>
             <a class="{% if request.endpoint == 'reservations' %}is-active{% endif %}">
               <i class="fas fa-calendar-check"></i>&nbsp; การจอง
             </a>
@@ -109,7 +111,7 @@
             <a class="{% if request.endpoint == 'customers' %}is-active{% endif %}">
               <i class="fas fa-user-friends"></i>&nbsp; ลูกค้า
             </a>
-          </li>
+          </li> -->
           <li>
             <a href="{{ url_for('report') }}" class="{% if request.endpoint == 'report' %}is-active{% endif %}">
               <i class="fas fa-chart-line"></i>&nbsp; วิเคราะห์ข้อมูล

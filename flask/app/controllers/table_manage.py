@@ -306,3 +306,15 @@ def table_cancle():
                 raise
 
     return table_list()
+
+@app.route('/table/test')
+@login_required
+@roles_required('Admin')
+def table_test():
+    return render_template('test_bend.html')
+
+@app.route('/table/create_new')
+@login_required
+@roles_required('Admin')
+def table_creates():
+    return render_template('Admin_page/list_table.html')
