@@ -8,6 +8,7 @@
       Add/Edit an Employee:
     </h2>
     <form id="addEmployeeForm" class="box">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="field">
         <label class="label has-text-black" for="firstname">First Name</label>
         <div class="control">

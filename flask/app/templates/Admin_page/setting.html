@@ -15,6 +15,7 @@
         <div class="box">
           <h2 class="subtitle">ชื่อร้านอาหาร</h2>
           <form method="POST" action="/setting">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class="field">
               <label class="label" for="name">name</label>
               <div class="control">
@@ -47,6 +48,7 @@
           <div class="box">
             <h2 class="subtitle">เสียงแจ้งเตือนออเดอร์เข้าในห้องครัว</h2>
             <form method="POST" action="/setting" enctype="multipart/form-data">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
               <div class="field">
                 <label class="label" for="cooking_sound">Cooking Room Sound (cooking_room.mp3)</label>
                 <div class="control">

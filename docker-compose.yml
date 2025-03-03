@@ -40,7 +40,7 @@ services:
     image: wernight/ngrok
     environment:
       - NGROK_PORT=flask:8000
-      - NGROK_AUTHTOKEN=24AU78hQwAZMbQUvvShHMt7Jv7o_462StCAH9JbhteWCpgTrs
+      - NGROK_AUTHTOKEN=2tl73zJmHTtA8CFDvWE8nvc9rNK_3BficAixYmQAxqFksYath
     ports:
       - "4040:4040"
     entrypoint: ["sh", "-c", "ngrok http flask:8000"]

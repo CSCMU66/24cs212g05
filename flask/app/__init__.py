@@ -4,6 +4,7 @@ from werkzeug.debug import DebuggedApplication
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
 
 
 app = Flask(__name__, static_folder='static')
@@ -25,6 +26,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 if app.debug:
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
+
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 # Creating an SQLAlchemy instance
 db = SQLAlchemy(app)
