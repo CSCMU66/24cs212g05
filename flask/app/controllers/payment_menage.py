@@ -84,7 +84,7 @@ def gennerate_qrcode(id, count):
     token = generate_jwt(id, count)
     img = qrcode.make(f'http://localhost:56733/menu/table/{token}') # Must to change to menu select url
     type(img)  # qrcode.image.pil.PilImage
-    img.save(f"app/static/qrcode/{id}.png")
+    img.save(f"static/qrcode/{id}.png")
     return f"app/static/qrcode/{id}.png"
 
 def generate_jwt(table_number, count):
@@ -236,7 +236,7 @@ def customer_view():
         qr.add_data(qr_data)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
-        img.save(f'app/static/qrcode_pp/{table_id}.png')
+        img.save(f'static/qrcode_pp/{table_id}.png')
 
 
         temp = {'vat_7%': vat, 'total' : subtotal, 'sum_price': sum_list, 'vat%': store['vat'], 'qrcode': f'app/static/qrcode_pp/{table_id}.png'}
